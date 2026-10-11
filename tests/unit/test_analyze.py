@@ -1,5 +1,7 @@
 import time
 
+import pytest
+
 from narrareel.script import analyze_script, synthesis_units
 
 
@@ -60,6 +62,46 @@ def test_ellipsis_inside_sentence():
 def test_ellipsis_before_capital_splits():
     a = analyze_script("I waited... Then it came.")
     assert len(a.sentences) == 2
+
+
+@pytest.mark.parametrize("opening,closing", [('"', '"'), ("“", "”"), ("'", "'"), ("‘", "’")])
+@pytest.mark.parametrize("ellipsis", ["...", "…"])
+def test_ellipsis_before_quoted_continuation(opening, closing, ellipsis):
+    script = f"She paused{ellipsis} {opening}maybe tomorrow.{closing} Next time."
+    a = analyze_script(script)
+    assert [s.text for s in a.sentences] == [
+        f"She paused{ellipsis} {opening}maybe tomorrow.{closing}", "Next time."
+    ]
+
+
+@pytest.mark.parametrize("following,expected_count", [("We left.", 2), ("we left.", 1)])
+@pytest.mark.parametrize("abbreviation", ["p.m.", "a.m.", "etc."])
+def test_conditional_abbreviation_before_quote(following, expected_count, abbreviation):
+    a = analyze_script(f'We finished at {abbreviation} “{following}”')
+    assert len(a.sentences) == expected_count
+
+
+def test_initial_before_quoted_name():
+    a = analyze_script('J. “Jack” Smith arrived. He waved.')
+    assert [s.text for s in a.sentences] == ['J. “Jack” Smith arrived.', 'He waved.']
+
+
+def test_nested_quotes_after_ellipsis():
+    a = analyze_script('She paused... “\'maybe tomorrow.\'” Next time.')
+    assert [s.text for s in a.sentences] == ['She paused... “\'maybe tomorrow.\'”', 'Next time.']
+
+
+def test_quoted_ellipsis_before_capital_splits():
+    a = analyze_script('She paused… “Tomorrow is better.”')
+    assert [s.text for s in a.sentences] == ['She paused…', '“Tomorrow is better.”']
+
+
+def test_decimals_and_quoted_title_preserve_spans():
+    a = analyze_script('“Dr. Smith paid 3.50.” Then he left.')
+    assert [s.text for s in a.sentences] == ['“Dr. Smith paid 3.50.”', 'Then he left.']
+    for token in a.tokens:
+        assert a.text[token.start_char:token.end_char] == token.text
+    assert [u.text for u in synthesis_units(a)] == [s.text for s in a.sentences]
 
 
 def test_short_unpunctuated_fragment_merges():

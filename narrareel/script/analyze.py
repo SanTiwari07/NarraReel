@@ -119,7 +119,9 @@ def _split_line(line: str) -> list[tuple[int, int]]:
         run = m.group()
         core = run.rstrip("\"'”’)]")
         rest = line[end:].lstrip()
-        nxt = rest[:1]
+        # Quotes do not determine capitalization: look at the text inside them,
+        # including nested quotes, without changing the original sentence spans.
+        nxt = rest.lstrip("\"'“‘")[:1]
         ws = max(line.rfind(" ", 0, m.start()), -1)
         word = line[ws + 1 : end].lstrip("\"'“‘([")
         word_l = word.lower().rstrip("\"'”’)]")
