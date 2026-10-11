@@ -25,7 +25,7 @@ The clip above was made with NarraReel itself, from [this script](docs/assets/de
 - **Exact length.** "Make this 60 seconds" lands on the second: NarraReel stretches the pauses between
   sentences first (it sounds natural), changes speed only for what is left, and tells you honestly how many words to add or cut.
 - **Captions that keep people watching.** Every word is highlighted at the moment it is spoken, using the voice
-  engine's own word timings. Eight presets, 18 bundled fonts, a live preview, and a transparent overlay export
+  engine's own word timings. Ten presets, 19 bundled fonts, a live preview, and a transparent overlay export
   for your editor.
 - **Open and local.** MIT code, commercial-friendly models, fonts you may ship. Works offline after one model download.
 
@@ -67,7 +67,7 @@ docker run -p 8765:8765 -v narrareel-data:/data narrareel     # open the link it
 5. **Export**: MP4, or WebM / ProRes with transparency. You also get the voiceover (MP3, WAV), subtitles (SRT, styled ASS),
    per-word timings (JSON) and a project file. Restyling later reuses the voiceover.
 
-<p align="center"><img src="docs/assets/presets.png" alt="The eight caption presets" width="560"></p>
+<p align="center"><img src="docs/assets/presets.png" alt="Some of the caption presets" width="560"></p>
 
 ### Caption styles
 
@@ -84,7 +84,7 @@ docker run -p 8765:8765 -v narrareel-data:/data narrareel     # open the link it
 | `typewriter` | Ink on paper, red ribbon highlight |
 | `highlighter` | Marker-pen yellow box sweeping behind the active word |
 
-List them any time with `narrareel styles`.
+List them any time with `narrareel styles`. See the [captions style guide](docs/captions.md) for a picture of each one and the tweaks that work well.
 
 ## Command line
 
