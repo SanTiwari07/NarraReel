@@ -11,6 +11,7 @@
    about 17 px on 1080p, 19 px on 2K and 24 px on 4K. Height is checked too, so an ultrawide
    monitor does not blow the interface up. */
 html {
+  scrollbar-width: none; /* the page scrolls, but without a bar down the side */
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
   font-size: clamp(
@@ -25,6 +26,10 @@ html {
   }
 }
 
+html::-webkit-scrollbar {
+  display: none;
+}
+
 body {
   margin: 0;
   background: var(--color-canvas);
@@ -35,6 +40,15 @@ body {
   min-height: 100vh;
   min-height: 100dvh;
   overflow-wrap: break-word;
+}
+
+/* Nav, page, bar: together exactly one window tall when the page is short, so nothing scrolls
+   that does not need to and the Back / Next bar sits at the bottom. */
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 img,
@@ -260,6 +274,8 @@ textarea {
 /* ---------- page + workspace ---------- */
 
 .page {
+  flex: 1 0 auto;
+  width: 100%;
   max-width: calc(var(--workspace) + 2 * var(--gutter));
   margin: 0 auto;
   padding: var(--space-xl) max(var(--gutter), var(--safe-right)) var(--space-xxl) max(var(--gutter), var(--safe-left));
@@ -1094,11 +1110,12 @@ textarea {
 .script-input {
   display: block;
   width: 100%;
-  min-height: 16rem;
+  min-height: 14rem;
   padding: var(--space-lg);
   background: transparent;
   border: 0;
-  resize: vertical;
+  resize: none; /* it grows with the script instead */
+  overflow: hidden;
   color: var(--color-on-dark);
   font-size: var(--text-title-md);
   line-height: 1.6;
@@ -1286,21 +1303,23 @@ textarea {
   flex: none;
   width: 2.5rem;
   height: 2.5rem;
-  padding: 0;
-  border: 1px solid var(--color-hairline-strong);
+  padding: 0 0 0 2px; /* the triangle looks centred when nudged right */
+  border: 0;
   border-radius: 50%;
-  background: var(--color-surface-elevated);
-  color: var(--color-on-dark);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
   cursor: pointer;
 }
-.vtile__play:hover {
-  border-color: var(--color-on-dark);
+.vtile__play:active {
+  background: var(--color-primary-active);
 }
+/* while it plays, the button turns into a stop key with a yellow ring */
 .vtile__play--on,
-.vtile__play--on:hover {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
-  color: var(--color-on-primary);
+.vtile__play--on:active {
+  padding: 0;
+  background: var(--color-on-primary);
+  color: var(--color-primary);
+  box-shadow: inset 0 0 0 2px var(--color-primary);
 }
 .vtile__pick {
   display: flex;
@@ -1949,6 +1968,306 @@ textarea {
 .stack,
 .row {
   min-width: 0;
+}
+
+/* ---------- one question per screen ---------- */
+
+/* Question screens: one centred column, with the heading centred above it. */
+.solo {
+  width: 100%;
+  max-width: var(--solo);
+  margin: 0 auto;
+}
+.solo .step-head {
+  align-items: center;
+  text-align: center;
+}
+.solo .step-head .lede {
+  max-width: 40rem;
+}
+.step-nav--solo .step-nav__inner {
+  max-width: calc(var(--solo) + 2 * var(--gutter));
+}
+
+/* the start screen: no steps yet, just the first question */
+.start {
+  display: flex;
+  flex: 1 0 auto;
+  flex-direction: column;
+}
+.start__main {
+  display: flex;
+  flex: 1 0 auto;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-xxl);
+  width: 100%;
+  max-width: calc(44rem + 2 * var(--gutter));
+  margin: 0 auto;
+  padding: var(--space-xxl) max(var(--gutter), var(--safe-right)) var(--space-xxl) max(var(--gutter), var(--safe-left));
+}
+.start__head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  text-align: center;
+}
+.start__choices {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+.start-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-xxs) var(--space-lg);
+  width: 100%;
+  padding: var(--space-lg) var(--space-xl);
+  background: var(--color-surface-card);
+  border: 1px solid var(--color-hairline-strong);
+  border-radius: var(--radius-lg);
+  color: var(--color-body);
+  text-align: left;
+  cursor: pointer;
+}
+.start-card:hover {
+  border-color: var(--color-muted);
+}
+.start-card:disabled {
+  cursor: progress;
+  opacity: 0.7;
+}
+.start-card__title {
+  grid-column: 1;
+  color: var(--color-on-dark);
+  font-size: var(--text-title-lg);
+  font-weight: 700;
+  letter-spacing: var(--tracking-title);
+}
+.start-card__text {
+  grid-column: 1;
+  color: var(--color-muted);
+  font-size: var(--text-body-sm);
+}
+.start-card__meta {
+  margin-left: var(--space-xs);
+  color: var(--color-body);
+  white-space: nowrap;
+}
+.start-card__go {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  color: var(--color-on-dark);
+  font-size: var(--text-title-lg);
+  font-weight: 700;
+}
+/* the yellow card is the obvious first move */
+.start-card--primary,
+.start-card--primary:hover {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+.start-card--primary:active {
+  background: var(--color-primary-active);
+}
+.start-card--primary .start-card__title,
+.start-card--primary .start-card__text,
+.start-card--primary .start-card__go {
+  color: var(--color-on-primary);
+}
+
+/* length: the natural length as a yellow stat, then the choices under it */
+.length-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xxs);
+  text-align: center;
+}
+.length-stat__value {
+  color: var(--color-primary);
+  font-size: var(--text-display-lg);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: var(--tracking-md);
+  font-variant-numeric: tabular-nums;
+}
+.length-stat__label {
+  color: var(--color-muted);
+  font-size: var(--text-body-sm);
+}
+.choice-row--center {
+  justify-content: center;
+}
+
+/* voice: two big answers to one question */
+.source-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: var(--space-md);
+}
+.source-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-xs);
+  padding: var(--space-xl);
+  background: var(--color-surface-card);
+  border: 1px solid var(--color-hairline-strong);
+  border-radius: var(--radius-lg);
+  color: var(--color-body);
+  text-align: left;
+  cursor: pointer;
+}
+.source-card:hover:not(:disabled) {
+  border-color: var(--color-muted);
+}
+.source-card:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+.source-card--on,
+.source-card--on:hover:not(:disabled) {
+  border-color: var(--color-primary);
+  box-shadow: inset 0 0 0 1px var(--color-primary);
+}
+.source-card__icon {
+  display: grid;
+  place-items: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  margin-bottom: var(--space-xs);
+  border-radius: var(--radius-md);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+.source-card__title {
+  color: var(--color-on-dark);
+  font-size: var(--text-title-lg);
+  font-weight: 700;
+  letter-spacing: var(--tracking-title);
+}
+.source-card__text {
+  color: var(--color-muted);
+  font-size: var(--text-body-sm);
+}
+.source-card__now {
+  margin-top: var(--space-xs);
+  color: var(--color-primary);
+  font-size: var(--text-caption);
+  font-weight: 600;
+}
+
+/* my voice: where you are in the three short stages */
+.substeps {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-xs) var(--space-lg);
+  color: var(--color-muted);
+  font-size: var(--text-body-sm);
+  font-weight: 500;
+}
+.substep {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+.substep__dot {
+  display: inline-grid;
+  place-items: center;
+  width: 1.375rem;
+  height: 1.375rem;
+  border: 1.5px solid var(--color-hairline-strong);
+  border-radius: 50%;
+  font-size: 0.6875rem;
+  font-weight: 700;
+}
+.substep--done {
+  color: var(--color-body);
+}
+.substep--done .substep__dot {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+.substep--now {
+  color: var(--color-on-dark);
+  font-weight: 600;
+}
+.substep--now .substep__dot {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-on-primary);
+}
+.install-strip {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--color-surface-card);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-md);
+  color: var(--color-muted);
+  font-size: var(--text-body-sm);
+}
+.record-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+  padding-top: var(--space-xs);
+}
+.rec-dot {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 50%;
+  background: var(--color-rose);
+}
+.rec-dot--stop {
+  border-radius: 2px;
+  background: var(--color-on-primary);
+}
+.row--end {
+  justify-content: flex-end;
+}
+.saved-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+.saved {
+  padding: var(--space-sm) var(--space-md);
+}
+.saved__delete,
+.saved__confirm {
+  position: relative;
+  z-index: 1; /* above the tile-wide pick target */
+}
+.saved__confirm {
+  display: inline-flex;
+  gap: var(--space-xxs);
+}
+
+/* export: saving the project sits with the finished video */
+.save-project {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm) var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--color-surface-card);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-lg);
+}
+.save-project__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  color: var(--color-on-dark);
 }
 
 /* Touch screens: comfortable tap targets, no hover-only affordances. */

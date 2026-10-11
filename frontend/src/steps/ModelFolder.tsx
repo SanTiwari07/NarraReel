@@ -7,7 +7,7 @@ import { useSession } from '../state/session'
 const gb = (n: number) => `${n.toFixed(1)} GB`
 
 /** Asks where the multi-GB voice model should live, before it lands on a full system drive. */
-export function ModelFolder() {
+export function ModelFolder({ onAsking }: { onAsking?: (asking: boolean) => void }) {
   const toast = useSession((s) => s.toast)
   const [info, setInfo] = useState<ModelStorage | null>(null)
   const [open, setOpen] = useState(false)
@@ -26,6 +26,11 @@ export function ModelFolder() {
     void reload()
     return () => stop.current?.()
   }, [])
+
+  const asking = !!info && !info.from_env && (!info.chosen || open)
+  useEffect(() => {
+    onAsking?.(asking)
+  }, [asking, onAsking])
 
   if (!info || info.from_env) return null
 
@@ -87,7 +92,6 @@ export function ModelFolder() {
 
   const downloaded = info.models_gb >= 0.1
   const tight = info.free_gb !== null && !downloaded && info.free_gb < info.needed_gb + 1
-  const asking = !info.chosen || open
 
   const controls = progress ? (
     <div className="stack">

@@ -77,6 +77,7 @@
      workspace grows with the root font size on 2K and 4K screens and stays centred. */
   --workspace: 74rem;
   --rail: 20rem;
+  --solo: 48rem; /* question screens: one centred column */
   --gutter: var(--space-lg);
   --nav-height: 4rem;
   --bar-height: 4.5rem; /* the Back / Next bar pinned to the bottom */

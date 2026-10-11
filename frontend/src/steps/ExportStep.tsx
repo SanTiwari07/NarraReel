@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { Link, useNavigate } from 'react-router-dom'
 import { api, jobFileUrl, watchJob } from '../api/client'
 import { Banner, Button, CodeWindow, ProgressBar, Segmented } from '../components/ui'
+import { downloadProject } from '../lib/projectFile'
 import { formatDuration, slugFirstWords } from '../lib/time'
 import { useCatalog } from '../state/catalog'
 import { toProject, useDraft, voiceKey } from '../state/project'
@@ -23,7 +24,6 @@ const OTHER_FILES: { key: string; label: string; note: string }[] = [
   { key: 'captions_srt', label: 'Subtitles (SRT)', note: 'For YouTube and most editors' },
   { key: 'captions_ass', label: 'Styled subtitles (ASS)', note: 'Keeps your caption style' },
   { key: 'words_json', label: 'Word timings (JSON)', note: 'When every word starts and ends' },
-  { key: 'project', label: 'Project file', note: 'Open it later to keep editing' },
 ]
 
 function cliCommand(d: Draft): string {
@@ -131,7 +131,7 @@ export function ExportStep() {
 
   const checklist = [
     { label: 'Script', value: words ? `${words} words` : 'Not written yet', to: '/script', missing: !words },
-    { label: 'Length', value: draft.targetSeconds ? `Exactly ${formatDuration(draft.targetSeconds)}` : 'Natural length', to: '/script' },
+    { label: 'Length', value: draft.targetSeconds ? `Exactly ${formatDuration(draft.targetSeconds)}` : 'Natural length', to: '/length' },
     { label: 'Voice', value: voiceName, to: '/voice' },
     { label: 'Captions', value: fontName ? `${styleName}, in ${fontName}` : styleName, to: '/captions' },
     { label: 'Shape', value: fmt?.name ?? draft.format, to: '/captions' },
@@ -231,6 +231,22 @@ export function ExportStep() {
           ) : (
             <audio className="player-audio" controls src={jobFileUrl(job.id, 'voice.mp3')} />
           )}
+
+          <div className="save-project">
+            <span className="save-project__text">
+              <strong>Save this project</strong>
+              <span className="field__hint">Open it later from the start screen to change anything and make it again.</span>
+            </span>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                downloadProject()
+                toast('success', 'Project saved. Open it from the start screen any time.')
+              }}
+            >
+              Save project
+            </Button>
+          </div>
 
           {others.length > 0 && (
             <details className="disclosure">

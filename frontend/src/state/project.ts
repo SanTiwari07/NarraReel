@@ -109,12 +109,15 @@ export const useDraft = create<DraftStore>()(
     {
       name: 'narrareel.draft',
       version: 1,
-      // Browser storage can be missing or blocked; the app must still work without it.
+      // Kept for this tab only, so a reload does not lose work but a new visit starts clean
+      // (the start screen offers to continue). Storage can be missing or blocked; the app
+      // must still work without it.
       storage: createJSONStorage(() => {
         try {
-          window.localStorage.setItem('narrareel.probe', '1')
-          window.localStorage.removeItem('narrareel.probe')
-          return window.localStorage
+          window.localStorage.removeItem('narrareel.draft') // older versions kept drafts forever
+          window.sessionStorage.setItem('narrareel.probe', '1')
+          window.sessionStorage.removeItem('narrareel.probe')
+          return window.sessionStorage
         } catch {
           return { getItem: () => null, setItem: () => {}, removeItem: () => {} }
         }

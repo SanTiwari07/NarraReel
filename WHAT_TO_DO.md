@@ -1235,15 +1235,15 @@ Security: loopback-only by default with no auth. If `--host` is not loopback, re
 ### 5.15 Frontend (Phase 3, React)
 
 **Stack:** Vite + React + TypeScript (latest stable at setup time, pinned via `package-lock.json`). Minimal dependencies:
-- `react-router` — one route per step (`/script`, `/voice`, `/captions`, `/export`; `/duration` redirects to `/script`, see D30) so the browser back button works.
-- `zustand` — project state store, persisted to `localStorage` as a draft (wrapped in try/catch).
+- `react-router` — a start screen at `/`, then one route per question (`/script`, `/length`, `/voice`, `/voice/ai`, `/voice/mine`, `/voice/sound`, `/captions`, `/export`; `/duration` redirects to `/length`, see D32) so the browser back button works. `src/flow.ts` says which step each screen belongs to and where Back and Next go.
+- `zustand` — project state store, persisted to `sessionStorage` for the current tab only (wrapped in try/catch; D32).
 - `@tanstack/react-query` — API calls, caching, loading states (optional; can start with plain `fetch` + hooks).
 - No UI component library yet. Plain components + CSS variables.
 
 **Theming (important for the upcoming design spec):** every colour, radius, spacing, font and shadow is a CSS custom property in `src/theme/tokens.css`, with light and dark values. Components use only tokens — no hard-coded colours. When the owner sends the design `.md`, we change tokens and component markup, not logic.
 
 **Components (basic version):**
-- `Stepper` (4 steps, shows completion), `ReelRail` (preview + what the video is made of; replaced `SummaryBar`, D30)
+- `StartScreen` (new, continue, open), `Stepper` (5 steps, shows completion), `ReelRail` (preview + what the video is made of, on Captions and Make video only; D32)
 - `ScriptEditor` (textarea + live counts + sentence list + warnings)
 - `DurationPicker` (quick buttons, custom input, option cards with quality badges)
 - `VoiceList` (filters, voice cards with ▶ sample), `SpeedEnergyControls`, `VoicePreviewButton`
@@ -1873,6 +1873,7 @@ ffmpeg -hide_banner -filters | grep -E " (ass|subtitles) "
 
 **Session update (Linux sandbox, same day):** ran the CI commands locally on Linux / Python 3.13: `ruff check` clean, 275 backend tests pass, `check_licenses.py` passes, frontend typecheck + 13 tests + build pass. This found one real cross-platform bug (D25: the `bold-pop` golden file failed on Linux because of the Raqm layout engine) which would have failed the first Linux CI run; fixed. Added the perceptual-hash visual regression (P2-13). The Docker image could not be built in this sandbox (the container cannot reach `deb.debian.org`); Colab notebook commands were checked against the real CLI (flags and voice-id slug match) but not run on Colab.
 
+| D32 | One question per screen. A start screen asks first: start a new video, continue the draft in this tab, or open a saved project; Save project appears only next to a finished video. Length is its own step again (five steps: Script, Length, Voice, Captions, Make video). Voice asks AI voice or my own voice first, then shows that list, then a separate "How should it sound?" screen. My own voice is a wizard: one-time setup (model folder, then install), pick a saved voice or record a new one in three stages (read aloud, listen back, name it); importing and exporting voice files left the app, and uploading a recording only appears when the browser cannot record. Question screens use one centred 48rem column (`--solo`); Captions and Make video keep the preview rail. The draft lives in `sessionStorage` (old `localStorage` drafts are deleted). The window scrollbar is hidden, the script box grows with the text, and the page fills the window so short screens do not scroll. Voice play buttons are yellow | Owner feedback (2026-10-11): too many questions at once, unclear what to click next, content hugging the left, a 10-hour-old script still loaded, Save/Open shown before anything was made, and confusing My voice options (import a voice file next to a guided recording) |
 **Session update (Windows, later the same day):** checked the remaining items for real.
 - GitHub CI is green on the full matrix (Windows and Ubuntu x Python 3.10, 3.12, 3.13, plus frontend and licences), so the D25 fix and the golden/visual tests transfer across machines.
 - Docker: `docker/Dockerfile` and `docker/Dockerfile.space` both build; the app container serves the UI and API and rendered an 8 s video; the Space image answers in demo mode.
@@ -1887,3 +1888,5 @@ ffmpeg -hide_banner -filters | grep -E " (ass|subtitles) "
 **Session update (cloning fix and model folder, D31):** cloning failed because setuptools 84 had replaced the pinned version; fixed in code (D31a) and checked against the real Turbo weights: the model loads with the Perth watermarker and the saved voice speaks (3.2 s clip; the server's voice preview returned audio in 69 s on CPU). Added the "Where should the voice model be kept?" card to My own voice (D31b) with API routes `GET/PUT /api/storage/models`, `POST /api/storage/models/browse` and `/keep`, blocked in demo mode. The move is covered by unit tests on a fake cache; it was not run against the owner's real 6.7 GB copy, and the system folder window was not opened in testing. `test_voice_preview_unavailable_engine` now hides the `chatterbox` package, because it is installed on the owner's machine.
 
 *End of plan document. Next actions: owner items above, then Phase 6 backlog.*
+**Session update (one question per screen, D32):** reworked the web app flow from owner feedback; see D32. Checked in the browser at 1600 x 900 and 375 x 812: start screen, script, length (with and without a target), voice source, AI voices, saved voice pick, record stage, captions and make video; no sideways overflow, short screens do not scroll. Recording, the listen-back and name stages, and Save project after a real render were not exercised in the browser. 21 frontend tests, `tsc` and `vite build` pass; the built UI was copied into `narrareel/server/static`.
+

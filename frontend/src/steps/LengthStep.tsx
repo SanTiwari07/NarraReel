@@ -16,7 +16,7 @@ function optionTitle(o: DurationOption): string {
 }
 
 /** "How long should it be?": pick a length, and see how NarraReel will get there. */
-export function LengthSection() {
+export function LengthStep() {
   const { targetSeconds, targetText, durationOption, patch } = useDraft()
   const { plan, analysis } = useScriptInfo()
   const [custom, setCustom] = useState(targetText)
@@ -53,19 +53,20 @@ export function LengthSection() {
   const editOption = p?.options.find((o) => o.kind === 'edit_script')
 
   return (
-    <section className="section" aria-labelledby="length-title">
-      <div className="section__head">
-        <h2 className="section__title" id="length-title">
-          How long should it be?
-        </h2>
-        <p className="section__hint">
-          {natural !== null
-            ? `Read at a natural pace, your script takes about ${formatDuration(natural)}.`
-            : 'Write your script first and NarraReel will tell you how long it takes to say.'}
-        </p>
-      </div>
+    <div className="step">
+      <header className="step-head">
+        <h1 className="display">How long should it be?</h1>
+        <p className="lede">Keep the natural length, or pick an exact one and NarraReel will hit it to the second.</p>
+      </header>
 
-      <div className="choice-row" role="radiogroup" aria-label="Video length">
+      {natural !== null && (
+        <p className="length-stat">
+          <span className="length-stat__value">{formatDuration(natural)}</span>
+          <span className="length-stat__label">your script, read at a natural pace</span>
+        </p>
+      )}
+
+      <div className="choice-row choice-row--center" role="radiogroup" aria-label="Video length">
         <button
           type="button"
           role="radio"
@@ -187,11 +188,11 @@ export function LengthSection() {
               {Math.abs(editOption.words_delta ?? 0) < 2
                 ? 'Your script now fits at a natural pace.'
                 : editOption.message}{' '}
-              This updates as you edit the script above.
+              Go back to the script to edit it; this updates as you type.
             </p>
           )}
         </div>
       )}
-    </section>
+    </div>
   )
 }

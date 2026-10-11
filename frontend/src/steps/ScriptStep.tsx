@@ -1,10 +1,9 @@
-import { useRef, useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import { formatDuration } from '../lib/time'
 import { useDraft } from '../state/project'
 import { useScriptInfo } from '../state/scriptInfo'
 import { useSession } from '../state/session'
 import { Banner, Button } from '../components/ui'
-import { LengthSection } from './LengthSection'
 
 const LONG_SENTENCE = 35
 
@@ -15,8 +14,22 @@ export function ScriptStep() {
   const { analysis } = useScriptInfo()
   const toast = useSession((s) => s.toast)
   const fileRef = useRef<HTMLInputElement>(null)
+  const boxRef = useRef<HTMLTextAreaElement>(null)
   const [dragging, setDragging] = useState(false)
   const a = analysis.data
+
+  // the box grows with the script, so the page is the only thing that scrolls
+  useLayoutEffect(() => {
+    const fit = () => {
+      const el = boxRef.current
+      if (!el) return
+      el.style.height = 'auto'
+      el.style.height = `${el.scrollHeight}px`
+    }
+    fit()
+    window.addEventListener('resize', fit)
+    return () => window.removeEventListener('resize', fit)
+  }, [script])
 
   const readFile = async (file: File) => {
     if (!/\.(txt|md|markdown)$/i.test(file.name) && !file.type.startsWith('text/')) {
@@ -43,6 +56,7 @@ export function ScriptStep() {
           Script
         </label>
         <textarea
+          ref={boxRef}
           id="script"
           className="script-input"
           value={script}
@@ -130,8 +144,6 @@ export function ScriptStep() {
           </ol>
         </details>
       )}
-
-      <LengthSection />
     </div>
   )
 }

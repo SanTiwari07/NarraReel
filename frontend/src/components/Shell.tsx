@@ -1,23 +1,14 @@
-import { useRef } from 'react'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
-import { api } from '../api/client'
+import { STEPS, screenFor } from '../flow'
 import { formatDuration } from '../lib/time'
 import { useCatalog } from '../state/catalog'
 import { useSession } from '../state/session'
-import { toProject, useDraft } from '../state/project'
+import { useDraft } from '../state/project'
 import { useScriptInfo } from '../state/scriptInfo'
 import { PhoneFrame } from './PhoneFrame'
 import { Button } from './ui'
 
-/** The four things a person decides, in the order they decide them. */
-export const STEPS = [
-  { path: '/script', label: 'Script', next: 'Next: choose a voice' },
-  { path: '/voice', label: 'Voice', next: 'Next: style the captions' },
-  { path: '/captions', label: 'Captions', next: 'Next: make the video' },
-  { path: '/export', label: 'Make video', next: '' },
-] as const
-
-function Logo() {
+export function Logo() {
   return (
     <span className="brand">
       <svg className="brand__mark" viewBox="0 0 32 32" aria-hidden="true">
@@ -41,7 +32,8 @@ function Check() {
 
 function Stepper() {
   const { pathname } = useLocation()
-  const current = STEPS.findIndex((s) => s.path === pathname)
+  const draft = useDraft()
+  const current = screenFor(pathname, draft)?.step ?? -1
   return (
     <nav className="stepper" aria-label="Steps">
       <ol className="stepper__list">
@@ -64,59 +56,16 @@ function Stepper() {
   )
 }
 
+/** Logo and the steps. Opening a project happens on the start screen; saving, once the video is made. */
 export function TopNav() {
-  const fileRef = useRef<HTMLInputElement>(null)
-  const toast = useSession((s) => s.toast)
-  const load = useDraft((s) => s.load)
-
-  const openProject = async (file: File) => {
-    try {
-      const raw = JSON.parse(await file.text())
-      const project = await api.validateProject(raw)
-      load(project)
-      toast('success', `Opened ${file.name}`)
-    } catch (e) {
-      toast('error', e instanceof Error ? e.message : 'That file is not a NarraReel project.')
-    }
-  }
-
-  const saveProject = () => {
-    const project = toProject(useDraft.getState())
-    const blob = new Blob([JSON.stringify(project, null, 2)], { type: 'application/json' })
-    const a = document.createElement('a')
-    a.href = URL.createObjectURL(blob)
-    a.download = 'project.narrareel.json'
-    a.click()
-    window.setTimeout(() => URL.revokeObjectURL(a.href), 1000)
-    toast('success', 'Project saved. Open it any time to keep editing.')
-  }
-
   return (
     <header className="nav">
       <div className="nav__inner">
-        <NavLink to="/script" className="nav__home" aria-label="NarraReel home">
+        <NavLink to="/" className="nav__home" aria-label="NarraReel start screen">
           <Logo />
         </NavLink>
         <Stepper />
-        <div className="nav__actions">
-          <input
-            ref={fileRef}
-            type="file"
-            accept=".json,application/json"
-            hidden
-            onChange={(e) => {
-              const f = e.target.files?.[0]
-              if (f) void openProject(f)
-              e.target.value = ''
-            }}
-          />
-          <Button variant="text" onClick={() => fileRef.current?.click()} title="Open a saved project file">
-            Open project
-          </Button>
-          <Button variant="text" onClick={saveProject} title="Save everything to a file you can open later">
-            Save project
-          </Button>
-        </div>
+        <span aria-hidden="true" />
       </div>
     </header>
   )
@@ -140,7 +89,7 @@ function Recipe() {
 
   const rows = [
     { to: '/script', label: 'Script', value: hasScript ? `${a.word_count} words` : null, empty: 'Not written yet' },
-    { to: '/script', label: 'Length', value: length, empty: 'Set by your script' },
+    { to: '/length', label: 'Length', value: length, empty: 'Set by your script' },
     { to: '/voice', label: 'Voice', value: voiceName ?? null, empty: 'Not chosen' },
     { to: '/captions', label: 'Captions', value: style?.name ?? null, empty: 'Not chosen' },
     { to: '/captions', label: 'Format', value: fmt ? fmt.name.split(' (')[0].split(' / ')[0] : null, empty: 'Not chosen' },
@@ -159,7 +108,7 @@ function Recipe() {
   )
 }
 
-/** The right-hand column on every step: the video as it stands, and what it is made of. */
+/** The right-hand column where the look of the video is decided: the video as it stands. */
 export function ReelRail() {
   return (
     <div className="rail">
@@ -169,32 +118,34 @@ export function ReelRail() {
   )
 }
 
+/** Back on the left, the one way forward on the right. */
 export function StepNav() {
   const { pathname } = useLocation()
   const navigate = useNavigate()
-  const script = useDraft((s) => s.script)
-  const i = STEPS.findIndex((s) => s.path === pathname)
-  if (i < 0) return null
-  const prev = STEPS[i - 1]
-  const next = STEPS[i + 1]
-  const blocked = i === 0 && !script.trim()
+  const draft = useDraft()
+  const screen = screenFor(pathname, draft)
   // the last step draws its own bar, because its forward action is making the video
-  if (!next) return null
+  if (!screen || pathname === '/export') return null
+  const { back, next } = screen
   return (
-    <div className="step-nav">
+    <div className={screen.rail ? 'step-nav' : 'step-nav step-nav--solo'}>
       <div className="step-nav__inner">
-        {prev ? (
-          <Button variant="text" onClick={() => navigate(prev.path)}>
+        {back ? (
+          <Button variant="secondary" onClick={() => navigate(back)}>
             Back
           </Button>
         ) : (
           <span />
         )}
         <div className="step-nav__next">
-          {blocked && <span className="step-nav__error">Add a script first.</span>}
-          <Button variant="primary" className="btn--lg" disabled={blocked} onClick={() => navigate(next.path)}>
-            {STEPS[i].next}
-          </Button>
+          {next?.blocked && <span className="step-nav__error">{next.blocked}</span>}
+          {next ? (
+            <Button variant="primary" className="btn--lg" disabled={!!next.blocked} onClick={() => navigate(next.to)}>
+              {next.label}
+            </Button>
+          ) : (
+            <span className="step-nav__error">Pick one above to continue.</span>
+          )}
         </div>
       </div>
     </div>
