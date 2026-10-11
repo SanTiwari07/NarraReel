@@ -71,21 +71,28 @@ def _is_emoji(ch: str) -> bool:
     )
 
 
-def _script_counts(text: str) -> tuple[int, int]:
-    devanagari = latin = 0
+def _script_counts(text: str) -> tuple[int, int, int]:
+    """Count letters per script: (Devanagari, Latin, Tamil)."""
+    devanagari = latin = tamil = 0
     for ch in text:
         if "ऀ" <= ch <= "ॿ":
             if ch.isalpha():
                 devanagari += 1
+        elif "஀" <= ch <= "௿":
+            if ch.isalpha():
+                tamil += 1
         elif ch.isalpha() and (ch.isascii() or "À" <= ch <= "ɏ"):
             latin += 1
-    return devanagari, latin
+    return devanagari, latin, tamil
 
 
 def detect_language(text: str) -> str:
-    devanagari, latin = _script_counts(text)
-    if devanagari + latin == 0:
+    """Return ``hi``, ``ta``, ``en`` (whichever script dominates) or ``unknown``."""
+    devanagari, latin, tamil = _script_counts(text)
+    if devanagari + latin + tamil == 0:
         return "unknown"
+    if tamil > devanagari and tamil > latin:
+        return "ta"
     return "hi" if devanagari > latin else "en"
 
 
@@ -328,12 +335,19 @@ def _collect_warnings(a: ScriptAnalysis) -> list[ScriptWarning]:
                 message=f"{a.word_count} words is a long script. Generation may take a while.",
             )
         )
-    devanagari, latin = _script_counts(text)
+    devanagari, latin, tamil = _script_counts(text)
     if devanagari and latin:
         out.append(
             ScriptWarning(
                 code="mixed_scripts",
                 message="Your script mixes Hindi (Devanagari) and Latin text. Pick a voice and font that cover both.",
+            )
+        )
+    elif tamil and latin:
+        out.append(
+            ScriptWarning(
+                code="mixed_scripts",
+                message="Your script mixes Tamil and Latin text. Pick a voice and font that cover both.",
             )
         )
     return out

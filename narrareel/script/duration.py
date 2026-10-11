@@ -17,7 +17,9 @@ from ..models import (
     ScriptAnalysis,
 )
 
-DEFAULT_CPS = {"en": 14.0, "hi": 12.0}
+# Characters (letters, digits and combining marks) per second at 1.0x. English and Hindi are
+# estimates; Tamil (11.8) was measured over two ta-IN Edge voices (11.9 and 11.6 cps).
+DEFAULT_CPS = {"en": 14.0, "hi": 12.0, "ta": 11.8}
 FALLBACK_CPS = 14.0
 PRESET_SPEEDS = (0.75, 1.0, 1.25, 1.5, 2.0)
 MIN_SPEED, MAX_SPEED = 0.5, 2.0
