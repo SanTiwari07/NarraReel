@@ -82,6 +82,7 @@ docker run -p 8765:8765 -v narrareel-data:/data narrareel     # open the link it
 | `keyword-emphasis` | Key words emphasised in yellow |
 | `subtitle-classic` | Classic centred subtitles |
 | `typewriter` | Ink on paper, red ribbon highlight |
+| `highlighter` | Marker-pen yellow box sweeping behind the active word |
 
 List them any time with `narrareel styles`.
 

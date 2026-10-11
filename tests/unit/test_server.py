@@ -147,7 +147,7 @@ def test_fonts_list_preview_upload(client):
 
 
 def test_presets_and_save_user_style(client):
-    assert len(client.get("/api/presets/styles").json()) == 8
+    assert len(client.get("/api/presets/styles").json()) == 10
     assert {f["id"] for f in client.get("/api/presets/formats").json()} >= {"reels", "youtube"}
     r = client.post("/api/presets/styles", json={
         "name": "My Look", "preset": "boxed", "overrides": {"colors": {"text": "#00FF00"}}})

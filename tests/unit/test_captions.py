@@ -60,7 +60,7 @@ def test_bad_colours(bad):
 # -------------------------------------------------------------------- styles
 
 
-def test_nine_presets_validate_against_schema():
+def test_all_presets_validate_against_schema():
     jsonschema = pytest.importorskip("jsonschema")
     schema = json.loads((config.presets_dir() / "styles" / "schema.json").read_text(encoding="utf-8"))
     assert schema == json_schema(), "schema.json is stale: run scripts/write_presets.py"
@@ -73,7 +73,7 @@ def test_nine_presets_validate_against_schema():
         ids.append(data["id"])
     assert sorted(ids) == sorted(
         ["bold-pop", "karaoke", "boxed", "one-word", "minimal", "neon", "keyword-emphasis",
-         "subtitle-classic", "typewriter"]
+         "subtitle-classic", "typewriter", "highlighter"]
     )
 
 

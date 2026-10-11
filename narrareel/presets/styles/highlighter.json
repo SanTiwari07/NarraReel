@@ -1,0 +1,40 @@
+{
+  "id": "highlighter",
+  "name": "Highlighter",
+  "version": 1,
+  "font": {
+    "id": "permanent-marker-regular",
+    "size": 76,
+    "uppercase": false,
+    "letter_spacing": 0
+  },
+  "colors": {
+    "text": "#141414",
+    "highlight": "#141414",
+    "outline": "#F5F5F0",
+    "shadow": "#00000000",
+    "box": null
+  },
+  "outline_width": 4,
+  "shadow_offset": 0,
+  "layout": {
+    "words_per_chunk": 3,
+    "max_lines": 2,
+    "position": "lower_middle",
+    "offset_y": 0
+  },
+  "highlight": {
+    "mode": "word",
+    "scale": 1.0,
+    "box": true,
+    "box_color": "#FFE14D",
+    "box_padding": 12
+  },
+  "animation": {
+    "in": "fade",
+    "duration_ms": 150
+  },
+  "emphasis": {
+    "enabled": false
+  }
+}
