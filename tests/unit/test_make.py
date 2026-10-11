@@ -303,7 +303,7 @@ def test_preview_transparent_uses_neutral_backdrop():
 
 def test_cli_formats_styles_fonts_json():
     assert len(json.loads(runner.invoke(app, ["formats", "--json"]).output)) == 5
-    assert len(json.loads(runner.invoke(app, ["styles", "--json"]).output)) == 8
+    assert len(json.loads(runner.invoke(app, ["styles", "--json"]).output)) == 10
     assert len(json.loads(runner.invoke(app, ["fonts", "--json"]).output)) >= 15
 
 
