@@ -238,6 +238,24 @@
     ]
   },
   {
+    "id": "caveat-brush-regular",
+    "family": "Caveat Brush",
+    "style": "Regular",
+    "weight": 400,
+    "file": "CaveatBrush/CaveatBrush-Regular.ttf",
+    "ass_family": "Caveat Brush",
+    "ass_bold": false,
+    "license": "OFL-1.1",
+    "license_file": "CaveatBrush/OFL.txt",
+    "source": "https://fonts.google.com/specimen/Caveat+Brush",
+    "tags": [
+      "handwritten"
+    ],
+    "scripts": [
+      "latin"
+    ]
+  },
+  {
     "id": "inter-bold",
     "family": "Inter",
     "style": "Bold",

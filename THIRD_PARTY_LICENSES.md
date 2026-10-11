@@ -60,6 +60,25 @@ Chatterbox output carries Resemble AI's Perth watermark. NarraReel keeps it enab
 Only OFL-1.1 or Apache-2.0 fonts are bundled, each next to its licence file under
 `narrareel/assets/fonts/`. See `narrareel/assets/fonts/manifest.json` for the full list.
 
+| Family | Licence | Source |
+|---|---|---|
+| Montserrat | OFL-1.1 | [Google Fonts](https://fonts.google.com/specimen/Montserrat) |
+| Anton | OFL-1.1 | [Google Fonts](https://fonts.google.com/specimen/Anton) |
+| Bebas Neue | OFL-1.1 | [Google Fonts](https://fonts.google.com/specimen/Bebas+Neue) |
+| Poppins | OFL-1.1 | [Google Fonts](https://fonts.google.com/specimen/Poppins) |
+| Oswald | OFL-1.1 | [Google Fonts](https://fonts.google.com/specimen/Oswald) |
+| Archivo Black | OFL-1.1 | [Google Fonts](https://fonts.google.com/specimen/Archivo+Black) |
+| Bangers | OFL-1.1 | [Google Fonts](https://fonts.google.com/specimen/Bangers) |
+| Luckiest Guy | Apache-2.0 | [Google Fonts](https://fonts.google.com/specimen/Luckiest+Guy) |
+| Lilita One | OFL-1.1 | [Google Fonts](https://fonts.google.com/specimen/Lilita+One) |
+| Permanent Marker | Apache-2.0 | [Google Fonts](https://fonts.google.com/specimen/Permanent+Marker) |
+| Caveat Brush | OFL-1.1 | [Google Fonts](https://fonts.google.com/specimen/Caveat+Brush) |
+| Inter | OFL-1.1 | [Google Fonts](https://fonts.google.com/specimen/Inter) |
+| Rubik | OFL-1.1 | [Google Fonts](https://fonts.google.com/specimen/Rubik) |
+| Kanit | OFL-1.1 | [Google Fonts](https://fonts.google.com/specimen/Kanit) |
+| Roboto Condensed | OFL-1.1 | [Google Fonts](https://fonts.google.com/specimen/Roboto+Condensed) |
+| Noto Sans Devanagari | OFL-1.1 | [Google Fonts](https://fonts.google.com/specimen/Noto+Sans+Devanagari) |
+
 ## Not used (and why)
 
 F5-TTS weights (CC-BY-NC), XTTS-v2 (Coqui Public Model License), Fish Speech and Spark-TTS

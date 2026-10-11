@@ -71,6 +71,8 @@ FAMILIES: list[Family] = [
         Face("Regular", 400, "LilitaOne-Regular.ttf", None, ["fun", "bold"])]),
     Family("Permanent Marker", "apache/permanentmarker", "LICENSE.txt", [
         Face("Regular", 400, "PermanentMarker-Regular.ttf", None, ["handwritten"])]),
+    Family("Caveat Brush", "ofl/caveatbrush", "OFL.txt", [
+        Face("Regular", 400, "CaveatBrush-Regular.ttf", None, ["handwritten"])]),
     Family("Inter", "ofl/inter", "OFL.txt", [
         Face("Bold", 700, "Inter[opsz,wght].ttf", {"wght": 700, "opsz": 14}, ["clean"])]),
     Family("Rubik", "ofl/rubik", "OFL.txt", [
