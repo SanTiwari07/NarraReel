@@ -69,6 +69,22 @@ docker run -p 8765:8765 -v narrareel-data:/data narrareel     # open the link it
 
 <p align="center"><img src="docs/assets/presets.png" alt="The eight caption presets" width="560"></p>
 
+### Caption styles
+
+| Style (`--style <id>`) | Look |
+|---|---|
+| `minimal` | Small white text, no highlight |
+| `boxed` | White text, word highlight |
+| `karaoke` | Green karaoke word highlight |
+| `neon` | Pale text, yellow word highlight |
+| `bold-pop` | Large black type, yellow highlight |
+| `one-word` | One huge word at a time |
+| `keyword-emphasis` | Key words emphasised in yellow |
+| `subtitle-classic` | Classic centred subtitles |
+| `typewriter` | Ink on paper, red ribbon highlight |
+
+List them any time with `narrareel styles`.
+
 ## Command line
 
 ```bash

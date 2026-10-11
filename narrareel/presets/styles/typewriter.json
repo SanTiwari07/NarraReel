@@ -1,0 +1,41 @@
+{
+  "id": "typewriter",
+  "name": "Typewriter",
+  "version": 1,
+  "font": {
+    "id": "archivo-black-regular",
+    "size": 62,
+    "uppercase": false,
+    "letter_spacing": 1
+  },
+  "colors": {
+    "text": "#1A1A1A",
+    "highlight": "#B30000",
+    "outline": "#F5F0E1",
+    "shadow": "#00000000",
+    "box": "#F5F0E1"
+  },
+  "outline_width": 2,
+  "shadow_offset": 0,
+  "border_style": "box",
+  "layout": {
+    "words_per_chunk": 4,
+    "max_lines": 2,
+    "position": "bottom",
+    "offset_y": 0
+  },
+  "highlight": {
+    "mode": "karaoke",
+    "scale": 1.0,
+    "box": false,
+    "box_color": "#FF3B6B",
+    "box_padding": 14
+  },
+  "animation": {
+    "in": "none",
+    "duration_ms": 0
+  },
+  "emphasis": {
+    "enabled": false
+  }
+}
