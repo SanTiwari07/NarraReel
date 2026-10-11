@@ -48,6 +48,9 @@ The repository ships the web app's source; to build it, run `npm ci && npm run b
 Optional extras: `".[offline]"` offline voices (Kokoro), `".[align]"` precise word timing for any voice,
 `".[clone]"` your own cloned voice ([details](docs/voice-cloning.md)).
 
+Stuck at any step? [Open an issue](https://github.com/SanTiwari07/NarraReel/issues/new/choose) and tell us where.
+Unclear setup instructions count as bugs, and we fix them.
+
 With Docker:
 
 ```bash
@@ -115,6 +118,17 @@ Every command has `--help`; most take `--json`.
 Based on each project's own description when we compared them (October 2026); corrections are welcome. Different
 tools for different jobs: if you want a video generated from a topic, those projects are further along than we are.
 
+## Tech stack
+
+| Part | Built with |
+|---|---|
+| Core, CLI | Python 3.10+, [Typer](https://typer.tiangolo.com/), Pydantic, Pillow |
+| Web app | [FastAPI](https://fastapi.tiangolo.com/) + Uvicorn server, React 19 + TypeScript UI built with Vite |
+| Voices | [edge-tts](https://github.com/rany2/edge-tts) (online), [kokoro-onnx](https://github.com/thewh1teagle/kokoro-onnx) (offline), [Chatterbox](https://github.com/resemble-ai/chatterbox) (cloning) |
+| Word timing | Voice engine timings, or [faster-whisper](https://github.com/SYSTRAN/faster-whisper) alignment |
+| Captions and video | ASS subtitles rendered by [ffmpeg](https://ffmpeg.org/) with libass |
+| Quality | pytest, Vitest, ruff, GitHub Actions CI on Linux and Windows |
+
 ## Responsible use
 
 Clone only your own voice, or a voice you have explicit permission to use. NarraReel asks every time and records
@@ -135,7 +149,10 @@ planned), background music with ducking. The plan and decisions live in [WHAT_TO
 ## Contributing
 
 Presets, fonts, formats and engines are plain files and small classes: see [CONTRIBUTING.md](CONTRIBUTING.md).
-Good first issues are listed there.
+Pick one of the [good first issues](https://github.com/SanTiwari07/NarraReel/labels/good%20first%20issue);
+each one lists the files to change and how to test it.
+
+If NarraReel saves you time, a ⭐ on the repo helps other creators find it.
 
 ## Credits and licence
 
