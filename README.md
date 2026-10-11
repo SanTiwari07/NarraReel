@@ -32,7 +32,7 @@ The clip above was made with NarraReel itself, from [this script](docs/assets/de
 ## Quick start
 
 You need Python 3.10+ and [ffmpeg](https://ffmpeg.org/) with libass (`winget install Gyan.FFmpeg`,
-`brew install ffmpeg`, or `sudo apt install ffmpeg`).
+`brew install ffmpeg`, or `sudo apt install ffmpeg`; commands for Fedora, Arch, openSUSE, Alpine and NixOS are in [docs/install.md](docs/install.md)).
 
 ```bash
 git clone https://github.com/SanTiwari07/NarraReel.git
