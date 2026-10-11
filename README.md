@@ -111,6 +111,9 @@ narrareel serve --open    # opens the web app in your browser
 
 That's it: write your script, pick a length, voice and caption style, then click **Make video**.
 
+Stuck at any step? [Open an issue](https://github.com/SanTiwari07/NarraReel/issues/new/choose) and tell us where.
+Unclear setup instructions count as bugs, and we fix them.
+
 <details>
 <summary><b>📦 Installing ffmpeg</b></summary>
 
@@ -248,6 +251,20 @@ flowchart LR
 Speaking one sentence at a time lets NarraReel measure every gap it can stretch, which is how it lands on the exact
 second without making the voice sound sped up.
 
+<details>
+<summary><b>🧱 Tech stack</b></summary>
+
+| Part | Built with |
+|---|---|
+| Core, CLI | Python 3.10+, [Typer](https://typer.tiangolo.com/), Pydantic, Pillow |
+| Web app | [FastAPI](https://fastapi.tiangolo.com/) + Uvicorn server, React 19 + TypeScript UI built with Vite |
+| Voices | [edge-tts](https://github.com/rany2/edge-tts) (online), [kokoro-onnx](https://github.com/thewh1teagle/kokoro-onnx) (offline), [Chatterbox](https://github.com/resemble-ai/chatterbox) (cloning) |
+| Word timing | Voice engine timings, or [faster-whisper](https://github.com/SYSTRAN/faster-whisper) alignment |
+| Captions and video | ASS subtitles rendered by [ffmpeg](https://ffmpeg.org/) with libass |
+| Quality | pytest, Vitest, ruff, GitHub Actions CI on Linux and Windows |
+
+</details>
+
 ---
 
 ## ⚖️ How it compares
@@ -302,8 +319,9 @@ The full plan and decisions live in [WHAT_TO_DO.md](WHAT_TO_DO.md).
 ## 🤝 Contributing
 
 Presets, fonts, formats and engines are plain files and small classes, so a new caption style can be **one JSON
-file**. See [CONTRIBUTING.md](CONTRIBUTING.md) to get started, and [good first issues](docs/good-first-issues.md)
-for a place to begin.
+file**. See [CONTRIBUTING.md](CONTRIBUTING.md) to get started, then pick one of the
+[good first issues](https://github.com/SanTiwari07/NarraReel/labels/good%20first%20issue); each one lists the files
+to change and how to test it.
 
 If NarraReel saved you an afternoon of editing, a ⭐ helps other creators find it.
 

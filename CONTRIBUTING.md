@@ -79,7 +79,8 @@ An engine turns **one sentence** into audio; the pipeline handles pauses, timing
 
 ## Good first issues
 
-Caption presets, fonts, Kokoro voice names for other languages, calibration paragraphs in other languages,
+Open ones are under the [`good first issue` label](https://github.com/SanTiwari07/NarraReel/labels/good%20first%20issue).
+Comment on one to claim it. Ideas that fit well: caption presets, fonts, Kokoro voice names for other languages, calibration paragraphs in other languages,
 sentence splitting for your language, ffmpeg install docs for your distro, format presets (LinkedIn, X).
 
 ## Reporting bugs
