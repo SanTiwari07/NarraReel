@@ -1,143 +1,319 @@
-<h1 align="center">NarraReel</h1>
+<h1 align="center">🎬 NarraReel</h1>
 
-<p align="center"><strong>Your script. Your voice. Viral captions. 100% open source.</strong></p>
+<h3 align="center">Your script. Your voice. Captions people watch to the end.</h3>
 
 <p align="center">
+  Turn a script you wrote into a finished Reel, Short or YouTube video, narrated in a free AI voice or <b>your own
+  cloned voice</b>, cut to <b>the exact second</b>, with <b>word-by-word animated captions</b>.<br>
+  Runs on your computer. No account. No API key. No watermark.
+</p>
+
+<p align="center">
+  <a href="https://github.com/SanTiwari07/NarraReel/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/SanTiwari07/NarraReel?style=flat&color=faff69&labelColor=0a0a0a&logo=github"></a>
   <a href="https://github.com/SanTiwari07/NarraReel/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/SanTiwari07/NarraReel/actions/workflows/ci.yml/badge.svg"></a>
   <img alt="Licence: MIT" src="https://img.shields.io/badge/licence-MIT-faff69?labelColor=0a0a0a">
   <img alt="Python 3.10+" src="https://img.shields.io/badge/python-3.10%2B-faff69?labelColor=0a0a0a">
+  <a href="CONTRIBUTING.md"><img alt="PRs welcome" src="https://img.shields.io/badge/PRs-welcome-faff69?labelColor=0a0a0a"></a>
   <a href="notebooks/NarraReel_Colab.ipynb"><img alt="Open in Colab" src="https://colab.research.google.com/assets/colab-badge.svg"></a>
 </p>
 
-<p align="center"><img src="docs/assets/demo.gif" alt="A NarraReel video: each word is highlighted as it is spoken" width="270"></p>
+<p align="center">
+  <a href="#-quick-start">Quick start</a> ·
+  <a href="#-why-narrareel">Features</a> ·
+  <a href="#-caption-styles">Caption styles</a> ·
+  <a href="#%EF%B8%8F-command-line">CLI</a> ·
+  <a href="#-how-it-works">How it works</a> ·
+  <a href="#%EF%B8%8F-roadmap">Roadmap</a>
+</p>
 
-NarraReel turns **the script you wrote** into a Reel, Short or YouTube video: narrated in a free AI voice
-(online or fully offline) or **your own cloned voice**, timed to the **exact length you ask for**, with
-**word-synced captions** in styles made for short video. It runs on your computer. No account, no API key, no
-watermark from us.
+<br>
 
-The clip above was made with NarraReel itself, from [this script](docs/assets/demo-script.txt).
+<table align="center">
+  <tr>
+    <th>✍️ You write this</th>
+    <th>🎥 NarraReel makes this</th>
+  </tr>
+  <tr>
+    <td width="360" valign="middle">
+      <pre>Your script. Your voice.
+Viral captions.
 
-## Why NarraReel
+NarraReel turns the script you
+wrote into a finished Reel.
+Pick the length, and it lands
+on the exact second.
+Pick a voice, free and offline,
+or clone your own.
 
-- **Your voice, with energy.** Record 30 seconds and narrate in your own voice, then dial the delivery from
-  calm to hype. AI voices that sound flat are the reason most faceless videos get skipped.
-- **Exact length.** "Make this 60 seconds" lands on the second: NarraReel stretches the pauses between
-  sentences first (it sounds natural), changes speed only for what is left, and tells you honestly how many words to add or cut.
-- **Captions that keep people watching.** Every word is highlighted at the moment it is spoken, using the voice
-  engine's own word timings. Ten presets, 19 bundled fonts, a live preview, and a transparent overlay export
-  for your editor.
-- **Open and local.** MIT code, commercial-friendly models, fonts you may ship. Works offline after one model download.
+Every word lights up exactly
+when it is spoken.
+Open source, and it runs on
+your computer.</pre>
+      <sub>That's the whole input: <a href="docs/assets/demo-script.txt">demo-script.txt</a></sub>
+    </td>
+    <td align="center" valign="middle">
+      <img src="docs/assets/demo.gif" alt="A NarraReel video: each word is highlighted as it is spoken" width="250">
+    </td>
+  </tr>
+</table>
 
-## Quick start
+<p align="center"><sub>The clip on the right was made by NarraReel from the text on the left. Nothing was edited by hand.</sub></p>
 
-You need Python 3.10+ and [ffmpeg](https://ffmpeg.org/) with libass (`winget install Gyan.FFmpeg`,
-`brew install ffmpeg`, or `sudo apt install ffmpeg`; commands for Fedora, Arch, openSUSE, Alpine and NixOS are in [docs/install.md](docs/install.md)).
+---
+
+## ✨ Why NarraReel
+
+Most faceless videos get skipped in the first two seconds. The voice sounds flat, the captions are a wall of
+text, and the clip is 7 seconds too long for the format. NarraReel fixes those three things for **the script you
+already wrote**. It does not generate your content for you.
+
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <h3>🎙️ Your voice, with energy</h3>
+      Record 30 seconds and narrate everything in your own cloned voice. Then set the delivery anywhere from
+      <i>calm</i> to <i>hype</i>. Prefer not to clone? Pick from free online voices or offline ones.
+    </td>
+    <td width="50%" valign="top">
+      <h3>⏱️ Exact length, to the second</h3>
+      Ask for <code>60s</code> and you get 60 seconds. NarraReel stretches the pauses between sentences first,
+      because that sounds natural, and changes speed only for what is left. If the gap is too big, it tells you
+      exactly how many words to add or cut.
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <h3>💬 Captions that keep people watching</h3>
+      Each word is highlighted at the moment it is spoken, using the voice engine's own word timings.
+      10 presets, 19 bundled fonts, a live preview, and a transparent overlay export for your editor.
+    </td>
+    <td width="50%" valign="top">
+      <h3>🔓 Open and local</h3>
+      MIT code, models you can use commercially, fonts you are allowed to ship. Works fully offline after one model
+      download. Nothing is uploaded, and there is no "Made with" stamp on your videos.
+    </td>
+  </tr>
+</table>
+
+---
+
+## 🚀 Quick start
+
+You need **Python 3.10+** and **[ffmpeg](https://ffmpeg.org/)** with libass.
 
 ```bash
 git clone https://github.com/SanTiwari07/NarraReel.git
 cd NarraReel
 pip install -e ".[server]"
-narrareel doctor                  # checks ffmpeg, voices and disk space
-narrareel serve --open            # the web app: script, duration, voice, captions, export
+narrareel doctor          # checks ffmpeg, voices and disk space
+narrareel serve --open    # opens the web app in your browser
 ```
 
-The repository ships the web app's source; to build it, run `npm ci && npm run build:wheel` in `frontend/` once
-(Node 22). Released packages will include it already.
+That's it: write your script, pick a length, voice and caption style, then click **Make video**.
 
-Optional extras: `".[offline]"` offline voices (Kokoro), `".[align]"` precise word timing for any voice,
-`".[clone]"` your own cloned voice ([details](docs/voice-cloning.md)).
+<details>
+<summary><b>📦 Installing ffmpeg</b></summary>
 
-With Docker:
+| OS | Command |
+|---|---|
+| Windows | `winget install Gyan.FFmpeg` |
+| macOS | `brew install ffmpeg` |
+| Debian / Ubuntu | `sudo apt install ffmpeg` |
+| Fedora, Arch, openSUSE, Alpine, NixOS | see [docs/install.md](docs/install.md) |
+
+</details>
+
+<details>
+<summary><b>🧩 Optional extras: offline voices, precise timing, voice cloning</b></summary>
+
+| Extra | What it adds |
+|---|---|
+| `pip install -e ".[offline]"` | Offline voices (Kokoro), no internet needed |
+| `pip install -e ".[align]"` | Precise word timing for any voice (faster-whisper) |
+| `pip install -e ".[clone]"` | Narrate in your own cloned voice (Chatterbox), [details](docs/voice-cloning.md) |
+
+</details>
+
+<details>
+<summary><b>🐳 Docker</b></summary>
 
 ```bash
 docker build -f docker/Dockerfile -t narrareel .
 docker run -p 8765:8765 -v narrareel-data:/data narrareel     # open the link it prints
 ```
 
-## The five steps
+</details>
 
-1. **Script**: paste or drop a `.txt`/`.md`. Live word count, estimated length, warnings for numbers, URLs and very long sentences.
-2. **Duration**: pick a target (15 s to 10 min, or type `6m`). See three honest options: edit the script (with the
-   exact number of words to add), adjust pauses and delivery, or change the speed. Each is badged *natural*,
-   *noticeable*, *strong* or *not recommended*.
-3. **Voice**: online and offline voices with samples, or your own cloned voice. Speed and energy, and a quick preview.
-4. **Captions**: format (Reels, YouTube, square, 4:5), style, font, colours, position, background (colour, image,
-   video loop or transparent). The preview frame is rendered by the same renderer as the final video.
-5. **Export**: MP4, or WebM / ProRes with transparency. You also get the voiceover (MP3, WAV), subtitles (SRT, styled ASS),
-   per-word timings (JSON) and a project file. Restyling later reuses the voiceover.
+<details>
+<summary><b>🛠️ Building the web app from source</b></summary>
 
-<p align="center"><img src="docs/assets/presets.png" alt="Some of the caption presets" width="560"></p>
-
-### Caption styles
-
-| Style (`--style <id>`) | Look |
-|---|---|
-| `minimal` | Small white text, no highlight |
-| `boxed` | White text, word highlight |
-| `karaoke` | Green karaoke word highlight |
-| `neon` | Pale text, yellow word highlight |
-| `bold-pop` | Large black type, yellow highlight |
-| `one-word` | One huge word at a time |
-| `keyword-emphasis` | Key words emphasised in yellow |
-| `subtitle-classic` | Classic centred subtitles |
-| `typewriter` | Ink on paper, red ribbon highlight |
-| `highlighter` | Marker-pen yellow box sweeping behind the active word |
-
-List them any time with `narrareel styles`. See the [captions style guide](docs/captions.md) for a picture of each one and the tweaks that work well.
-
-## Command line
+The repository ships the web app's source. To build it, run this once in `frontend/` (Node 22):
 
 ```bash
-narrareel voices --lang en                              # <engine>:<voice> references
-narrareel analyze script.txt --target 6m                # how long is it, and how do I fit 6:00?
-narrareel speak script.txt --target 60s                 # narration, word timings, subtitles
-narrareel make script.txt --target 60s --style boxed -o reel.mp4
-narrareel make script.txt --background transparent --style neon -o captions.webm
-narrareel preview script.txt --style karaoke -o frame.png
-narrareel clone me.wav --name "My voice" --i-have-consent
-narrareel make script.txt --voice chatterbox:my-voice --energy 0.8 -o reel.mp4
+npm ci && npm run build:wheel
 ```
 
-Every command has `--help`; most take `--json`.
+Released packages will include the built app already.
 
-## How it compares
+</details>
 
-| | NarraReel | AI-video generators (e.g. MoneyPrinterTurbo, ShortGPT) | Voice studios (e.g. VoiceStudio) |
-|---|---|---|---|
-| You write the script | **Yes**, that is the point | They write it from a topic | n/a |
-| Exact duration targeting | **Yes** | No | No |
-| Your cloned voice, energy control | **Yes** | Mostly stock voices | Yes |
-| Word-synced animated captions | **Yes**, presets + fonts + preview | Basic subtitles | No |
-| Stock footage / B-roll | Your own background only | **Yes** | No |
+---
+
+## 🪄 Four steps from script to Reel
+
+| | Step | What you do |
+|:-:|---|---|
+| **1** | **Script** | Write, paste or drop a `.txt`/`.md`. You get a live word count, estimated length, and warnings for numbers, URLs and very long sentences. Pick a length (15 s to 10 min, or type `6m`). If the script doesn't fit, choose a fix: change the script (with the exact number of words to cut or add), speak faster or slower with adjusted pauses, or change the speed only. Each option tells you how natural it will sound. |
+| **2** | **Voice** | Ready-made voices with samples, or your own cloned voice. Set the energy (calm, normal, hype) and speed, and preview your first lines. |
+| **3** | **Captions** | Choose where you'll post it (Reels, YouTube, square, 4:5) and a caption style. Optionally change the font, colours, position and background (colour, picture, video loop or see-through). |
+| **4** | **Make video** | Check your choices and make it. You get MP4, or WebM / ProRes with transparency, plus the voiceover (MP3, WAV), subtitles (SRT, styled ASS), per-word timings (JSON) and a project file. Restyling later reuses the voiceover, so it's instant. |
+
+> **What you see is what you export.** The preview next to every step is drawn by the same renderer as the final video.
+
+---
+
+## 🎨 Caption styles
+
+Ten presets designed for short video. Pick one with `--style <id>`, or list them with `narrareel styles`.
+
+<table>
+  <tr>
+    <td align="center"><img src="docs/assets/captions/bold-pop.png" alt="bold-pop caption style" width="360"><br><code>bold-pop</code><br><sub>Large black type, yellow highlight</sub></td>
+    <td align="center"><img src="docs/assets/captions/highlighter.png" alt="highlighter caption style" width="360"><br><code>highlighter</code><br><sub>Marker-pen box sweeping behind the active word</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/assets/captions/karaoke.png" alt="karaoke caption style" width="360"><br><code>karaoke</code><br><sub>Green karaoke word highlight</sub></td>
+    <td align="center"><img src="docs/assets/captions/neon.png" alt="neon caption style" width="360"><br><code>neon</code><br><sub>Pale text, yellow word highlight</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/assets/captions/one-word.png" alt="one-word caption style" width="360"><br><code>one-word</code><br><sub>One huge word at a time</sub></td>
+    <td align="center"><img src="docs/assets/captions/keyword-emphasis.png" alt="keyword-emphasis caption style" width="360"><br><code>keyword-emphasis</code><br><sub>Key words emphasised in yellow</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/assets/captions/boxed.png" alt="boxed caption style" width="360"><br><code>boxed</code><br><sub>White text, word highlight</sub></td>
+    <td align="center"><img src="docs/assets/captions/typewriter.png" alt="typewriter caption style" width="360"><br><code>typewriter</code><br><sub>Ink on paper, red ribbon highlight</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/assets/captions/minimal.png" alt="minimal caption style" width="360"><br><code>minimal</code><br><sub>Small white text, no highlight</sub></td>
+    <td align="center"><img src="docs/assets/captions/subtitle-classic.png" alt="subtitle-classic caption style" width="360"><br><code>subtitle-classic</code><br><sub>Classic centred subtitles</sub></td>
+  </tr>
+</table>
+
+Every preset is a plain JSON file you can tweak or copy. The [captions style guide](docs/captions.md) covers the
+settings that work well for each one.
+
+---
+
+## ⌨️ Command line
+
+Everything the web app does, you can script too:
+
+```bash
+narrareel analyze script.txt --target 6m                # how long is it, and how do I fit 6:00?
+narrareel make script.txt --target 60s --style boxed -o reel.mp4
+narrareel make script.txt --background transparent --style neon -o captions.webm   # overlay for your editor
+narrareel preview script.txt --style karaoke -o frame.png
+```
+
+<details>
+<summary><b>More commands</b></summary>
+
+```bash
+narrareel voices --lang en                              # list <engine>:<voice> references
+narrareel speak script.txt --target 60s                 # narration, word timings and subtitles only
+narrareel clone me.wav --name "My voice" --i-have-consent
+narrareel make script.txt --voice chatterbox:my-voice --energy 0.8 -o reel.mp4
+narrareel styles                                        # also: fonts, formats
+```
+
+Every command has `--help`, and most take `--json` for automation.
+
+</details>
+
+---
+
+## 🧠 How it works
+
+```mermaid
+flowchart LR
+    A["📝 Script"] --> B["Analyse<br/>words, length, language"]
+    B --> C["Speak sentence by sentence<br/>Edge · Kokoro · your voice"]
+    C --> D["Fit to target length<br/>pauses first, then speed"]
+    D --> E["Word timings<br/>native or Whisper-aligned"]
+    E --> F["Styled ASS captions"]
+    F --> G["ffmpeg + libass"]
+    G --> H["🎬 MP4 · WebM · ProRes<br/>+ MP3 · SRT · JSON"]
+```
+
+Speaking one sentence at a time lets NarraReel measure every gap it can stretch, which is how it lands on the exact
+second without making the voice sound sped up.
+
+---
+
+## ⚖️ How it compares
+
+| | **NarraReel** | AI-video generators<br><sub>e.g. MoneyPrinterTurbo, ShortGPT</sub> | Voice studios<br><sub>e.g. VoiceStudio</sub> |
+|---|:-:|:-:|:-:|
+| You write the script | ✅ that's the point | ❌ written from a topic | n/a |
+| Exact duration targeting | ✅ | ❌ | ❌ |
+| Your cloned voice + energy control | ✅ | ⚠️ mostly stock voices | ✅ |
+| Word-synced animated captions | ✅ presets, fonts, preview | ⚠️ basic subtitles | ❌ |
+| Stock footage / B-roll | ⚠️ your own background only | ✅ | ❌ |
 | Licence | MIT | MIT | AGPL-3.0 |
 
-Based on each project's own description when we compared them (October 2026); corrections are welcome. Different
-tools for different jobs: if you want a video generated from a topic, those projects are further along than we are.
+<sub>Based on each project's own description when we compared them (October 2026); corrections are welcome.
+Different tools for different jobs: if you want a video generated from a topic, those projects are further along
+than we are.</sub>
 
-## Responsible use
+---
+
+## 🛡️ Responsible use
 
 Clone only your own voice, or a voice you have explicit permission to use. NarraReel asks every time and records
 the confirmation, keeps the model's inaudible watermark on, and has no "clone from a link" feature. Read
-[docs/voice-cloning.md](docs/voice-cloning.md). Many platforms require labelling AI-generated content; check the
-current rules of the platform you post on.
+[docs/voice-cloning.md](docs/voice-cloning.md). Many platforms require labelling AI-generated content, so check
+the current rules of the platform you post on.
 
-## Status and roadmap
+---
 
-Working today: script analysis, exact-length narration, Edge (online) and Kokoro (offline) voices, word timing
-(native, estimated, or aligned with Whisper), 8 caption presets, 5 formats, transparent export, the web app, the
-CLI, and the voice-cloning flow and engine. The cloning engine is verified with a stand-in model in tests; run the
-check in [docs/voice-cloning.md](docs/voice-cloning.md) with your own recording and tell us how it sounds.
+## 🗺️ Roadmap
 
-Next: PyPI release, demo Space, more languages (Hindi voices and fonts work today; first-class Hinglish tooling is
-planned), background music with ducking. The plan and decisions live in [WHAT_TO_DO.md](WHAT_TO_DO.md).
+**Working today**
 
-## Contributing
+- [x] Script analysis and exact-length narration
+- [x] Edge (online) and Kokoro (offline) voices
+- [x] Word timing: native, estimated, or aligned with Whisper
+- [x] 10 caption presets, 19 fonts, 4 video formats plus audio-only, transparent export
+- [x] Web app and CLI
+- [x] Voice-cloning flow and engine (verified with a stand-in model in tests; [try it with your own recording](docs/voice-cloning.md) and tell us how it sounds)
+- [x] Hindi voices and fonts, Tamil detection
 
-Presets, fonts, formats and engines are plain files and small classes: see [CONTRIBUTING.md](CONTRIBUTING.md).
-Good first issues are listed there.
+**Next**
 
-## Credits and licence
+- [ ] PyPI release
+- [ ] Hosted demo Space
+- [ ] More languages, including first-class Hinglish tooling
+- [ ] Background music with automatic ducking
+
+The full plan and decisions live in [WHAT_TO_DO.md](WHAT_TO_DO.md).
+
+---
+
+## 🤝 Contributing
+
+Presets, fonts, formats and engines are plain files and small classes, so a new caption style can be **one JSON
+file**. See [CONTRIBUTING.md](CONTRIBUTING.md) to get started, and [good first issues](docs/good-first-issues.md)
+for a place to begin.
+
+If NarraReel saved you an afternoon of editing, a ⭐ helps other creators find it.
+
+<a href="https://star-history.com/#SanTiwari07/NarraReel&Date">
+  <img src="https://api.star-history.com/svg?repos=SanTiwari07/NarraReel&type=Date" alt="Star history chart" width="600">
+</a>
+
+---
+
+## 📜 Credits and licence
 
 NarraReel is [MIT](LICENSE). It stands on [edge-tts](https://github.com/rany2/edge-tts),
 [Kokoro](https://github.com/hexgrad/kokoro) via [kokoro-onnx](https://github.com/thewh1teagle/kokoro-onnx),
@@ -145,3 +321,5 @@ NarraReel is [MIT](LICENSE). It stands on [edge-tts](https://github.com/rany2/ed
 [faster-whisper](https://github.com/SYSTRAN/faster-whisper), [ffmpeg](https://ffmpeg.org/) and libass, and the
 [Google Fonts](https://fonts.google.com/) families we bundle. Every dependency, model and font with its licence is
 in [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md). NarraReel started life as "Text2Reel Generator".
+
+<p align="center"><sub>Made for creators who'd rather write than edit.</sub></p>
