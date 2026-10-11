@@ -2,6 +2,9 @@ name: Feature or preset request
 description: Suggest a feature, caption preset, font, format or voice engine
 labels: [enhancement]
 body:
+  - type: markdown
+    attributes:
+      value: "Thanks for helping improve NarraReel. If it is useful to you, please ⭐ star the repo so more creators find it."
   - type: textarea
     id: problem
     attributes:
