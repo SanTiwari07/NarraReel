@@ -13,14 +13,17 @@ from __future__ import annotations
 
 import hashlib
 import importlib
+import importlib.resources
 import importlib.util
 import logging
 import os
+import sys
 import threading
+import types
 
 import numpy as np
 
-from .. import config
+from .. import config, model_store
 from ..errors import EngineError, EngineUnavailable
 from ..models import EngineCapabilities, EngineStatus, VoiceInfo, VoiceSelection
 from ..voices import get_profile, list_profiles, reference_path
@@ -60,6 +63,54 @@ def pick_model(device: str, language: str = "en") -> str:
     if not language.lower().startswith("en"):
         return "multilingual"
     return "original" if device in ("cuda", "mps") else "turbo"
+
+
+class WatermarkerMissing(Exception):
+    """Chatterbox's watermarker (resemble-perth) failed to import, so no model can be built."""
+
+
+def _ensure_pkg_resources() -> None:
+    """Give resemble-perth the one ``pkg_resources`` function it uses, if setuptools no longer has it.
+
+    perth does ``from pkg_resources import resource_filename``. setuptools 81 dropped
+    ``pkg_resources``, and when that import fails perth quietly sets its watermarker to ``None``, so
+    every model then dies with "'NoneType' object is not callable". The ``setuptools<81`` pin in the
+    ``clone`` extra is not enough on its own: any later ``pip install`` (torch, for one) can upgrade
+    setuptools again (D26, D31).
+    """
+    try:
+        importlib.import_module("pkg_resources")
+        return
+    except ImportError:
+        pass
+    shim = types.ModuleType("pkg_resources")
+
+    def resource_filename(package: str, resource: str) -> str:
+        return str(importlib.resources.files(package).joinpath(resource))
+
+    shim.resource_filename = resource_filename  # type: ignore[attr-defined]
+    sys.modules["pkg_resources"] = shim
+    log.info("pkg_resources is missing (setuptools 81+); using a small stand-in for resemble-perth")
+    # an earlier attempt in this process may have imported perth without its watermarker
+    perth = sys.modules.get("perth")
+    if perth is not None and getattr(perth, "PerthImplicitWatermarker", None) is None:
+        importlib.reload(perth)
+
+
+def _check_watermarker() -> None:
+    """Fail with the real reason, not a NoneType error, when perth's watermarker did not import."""
+    perth = sys.modules.get("perth")
+    if perth is None or getattr(perth, "PerthImplicitWatermarker", True) is not None:
+        return
+    try:
+        importlib.import_module("perth.perth_net.perth_net_implicit.perth_watermarker")
+        reason = "unknown reason"
+    except Exception as exc:  # the import error perth swallowed
+        reason = f"{type(exc).__name__}: {exc}"
+    raise WatermarkerMissing(
+        f"Chatterbox's audio watermarker (resemble-perth) could not load ({reason}). "
+        'Reinstall it with: pip install --force-reinstall resemble-perth "setuptools<81"'
+    )
 
 
 class ChatterboxEngine(TTSEngine):
@@ -114,29 +165,31 @@ class ChatterboxEngine(TTSEngine):
             if kind in self._models:
                 return self._models[kind]
             device = self._device_name()
+            _ensure_pkg_resources()
+            folder = model_store.apply()  # the folder the person chose for the big download
+            module_name, class_name = {
+                "turbo": ("chatterbox.tts_turbo", "ChatterboxTurboTTS"),
+                "multilingual": ("chatterbox.mtl_tts", "ChatterboxMultilingualTTS"),
+            }.get(kind, ("chatterbox.tts", "ChatterboxTTS"))
             try:
-                if kind == "turbo":
-                    module = importlib.import_module("chatterbox.tts_turbo")
-                    model = module.ChatterboxTurboTTS.from_pretrained(device=device)
-                elif kind == "multilingual":
-                    module = importlib.import_module("chatterbox.mtl_tts")
-                    model = module.ChatterboxMultilingualTTS.from_pretrained(device=device)
-                else:
-                    module = importlib.import_module("chatterbox.tts")
-                    model = module.ChatterboxTTS.from_pretrained(device=device)
+                module = importlib.import_module(module_name)
+                _check_watermarker()
+                model = getattr(module, class_name).from_pretrained(device=device)
             except ImportError as exc:
                 raise EngineUnavailable(INSTALL_HINT) from exc
+            except WatermarkerMissing as exc:
+                raise EngineError(str(exc)) from exc
             except Exception as exc:
                 raise EngineError(
-                    f"The cloning model could not be loaded on {device} ({exc}). "
-                    "The first run downloads about 2 GB, so check your connection and disk space."
+                    f"The cloning model could not be loaded on {device} ({exc}). The first run downloads "
+                    f"about 4 GB into {folder}, so check your connection and the free space there."
                 ) from exc
             self._models[kind] = model
             return model
 
     def prepare(self, progress: ProgressFn | None = None) -> None:
         if progress:
-            progress(0.05, "Loading the voice model (the first run downloads about 2 GB)")
+            progress(0.05, "Loading the voice model (the first run downloads about 4 GB)")
         self._load(pick_model(self._device_name()))
         if progress:
             progress(1.0, "Ready")

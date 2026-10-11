@@ -1,7 +1,8 @@
 import { useMemo, useRef, useState } from 'react'
 import { api, fontPreviewUrl } from '../api/client'
 import type { FormatInfo, StylePreset } from '../api/types'
-import { Banner, Button, Card, ColorField, Field, Slider, Switch, Tabs } from '../components/ui'
+import { Banner, Button, ColorField, Field, Segmented, Slider, Switch } from '../components/ui'
+import type { ReactNode } from 'react'
 import { usePreviewUrl } from '../hooks/useAsync'
 import { LOW_CONTRAST, contrastRatio } from '../lib/color'
 import { useCatalog } from '../state/catalog'
@@ -21,6 +22,19 @@ const FONT_TAGS = [
 
 const THUMB_TEXT = 'Grind hard every single day.'
 
+/** A collapsed settings row that says what it is set to, so nothing hides a choice. */
+function Setting({ title, value, open, children }: { title: string; value?: string; open?: boolean; children: ReactNode }) {
+  return (
+    <details className="disclosure" open={open}>
+      <summary className="disclosure__summary">
+        <span>{title}</span>
+        {value && <span className="disclosure__value">{value}</span>}
+      </summary>
+      <div className="disclosure__body stack stack--lg">{children}</div>
+    </details>
+  )
+}
+
 function FormatPicker() {
   const formats = useCatalog((s) => s.formats)
   const format = useDraft((s) => s.format)
@@ -34,8 +48,13 @@ function FormatPicker() {
     }
   }
   return (
-    <Card className="stack" as="section">
-      <h2 className="title">Format</h2>
+    <section className="section" aria-labelledby="format-title">
+      <div className="section__head">
+        <h2 className="section__title" id="format-title">
+          Where will you post it?
+        </h2>
+        <p className="section__hint">This sets the shape of the video.</p>
+      </div>
       <div className="format-grid" role="radiogroup" aria-label="Video format">
         {formats.map((f) => {
           const on = f.id === format
@@ -48,12 +67,12 @@ function FormatPicker() {
                 {box ? <span style={{ width: box.width, height: box.height }} /> : <span className="format__audio" />}
               </span>
               <span className="format__name">{f.name}</span>
-              <span className="format__size">{w && h ? `${w} × ${h}` : 'No video'}</span>
+              <span className="format__size">{w && h ? `${w} × ${h}` : 'Sound only'}</span>
             </button>
           )
         })}
       </div>
-    </Card>
+    </section>
   )
 }
 
@@ -88,9 +107,15 @@ function FontGrid() {
   }
 
   return (
-    <Card className="stack" as="section">
+    <Setting title="Font" value={currentInfo?.name} open={!!needsDevanagari}>
       <div className="card-head">
-        <h2 className="title">Font</h2>
+        <div className="chip-row" role="group" aria-label="Font style">
+          {FONT_TAGS.map((t) => (
+            <button key={t.id} type="button" className={`chip ${tag === t.id ? 'chip--on' : ''}`} aria-pressed={tag === t.id} onClick={() => setTag(t.id)}>
+              {t.label}
+            </button>
+          ))}
+        </div>
         <input
           ref={fileRef}
           type="file"
@@ -103,15 +128,8 @@ function FontGrid() {
           }}
         />
         <Button variant="secondary" onClick={() => fileRef.current?.click()}>
-          Add your font
+          Add your own font
         </Button>
-      </div>
-      <div className="chip-row" role="group" aria-label="Font style">
-        {FONT_TAGS.map((t) => (
-          <button key={t.id} type="button" className={`chip ${tag === t.id ? 'chip--on' : ''}`} aria-pressed={tag === t.id} onClick={() => setTag(t.id)}>
-            {t.label}
-          </button>
-        ))}
       </div>
       {needsDevanagari && (
         <Banner tone="warn" title="This font can't show Hindi">
@@ -137,7 +155,7 @@ function FontGrid() {
           ))}
         </div>
       )}
-    </Card>
+    </Setting>
   )
 }
 
@@ -167,8 +185,13 @@ function PresetGrid() {
   const { captions, setCaptions, format } = useDraft()
   const fmt = formats.find((f) => f.id === format)
   return (
-    <Card className="stack" as="section">
-      <h2 className="title">Style</h2>
+    <section className="section" aria-labelledby="style-title">
+      <div className="section__head">
+        <h2 className="section__title" id="style-title">
+          Pick a caption style
+        </h2>
+        <p className="section__hint">Each one shows your captions as they will appear. You can adjust any of them below.</p>
+      </div>
       <div className="preset-grid" role="radiogroup" aria-label="Caption style">
         {styles.map((s) => {
           const on = s.id === captions.preset
@@ -180,7 +203,7 @@ function PresetGrid() {
           )
         })}
       </div>
-    </Card>
+    </section>
   )
 }
 
@@ -275,116 +298,122 @@ function FineTune() {
     }
   }
 
-  return (
-    <Card className="stack" as="section">
-      <details className="fine" open={dirty}>
-        <summary className="title">Fine-tune</summary>
-        <div className="fine__body stack stack--lg">
-          <div className="color-row">
-            <ColorField label="Text" value={eff.colors.text} onChange={(v) => setOverride('colors.text', v)} />
-            {highlightMode !== 'box' && (
-              <ColorField label="Highlight" value={eff.colors.highlight} onChange={(v) => setOverride('colors.highlight', v)} />
-            )}
-            <ColorField label="Outline" value={eff.colors.outline} onChange={(v) => setOverride('colors.outline', v)} />
-          </div>
+  const place = `${PLACE_ROWS.find((r) => r.id === eff.layout.position)?.label ?? ''}, ${PLACE_COLS.find((c) => c.id === eff.layout.align_x)?.label ?? ''}`
+  const placeName = place.charAt(0).toUpperCase() + place.slice(1)
 
-          <Field label="Highlight the spoken word with">
-            <Tabs
-              label="Highlight style"
-              value={highlightMode}
-              onChange={setHighlight}
+  return (
+    <>
+      <Setting title="Colours and size" value={dirty ? 'Changed' : 'As in the style'}>
+        <div className="color-row">
+          <ColorField label="Text" value={eff.colors.text} onChange={(v) => setOverride('colors.text', v)} />
+          {highlightMode !== 'box' && (
+            <ColorField label="Spoken word" value={eff.colors.highlight} onChange={(v) => setOverride('colors.highlight', v)} />
+          )}
+          <ColorField label="Outline" value={eff.colors.outline} onChange={(v) => setOverride('colors.outline', v)} />
+        </div>
+
+        <Field label="Show the spoken word with">
+          <Segmented
+            label="Highlight style"
+            value={highlightMode}
+            onChange={setHighlight}
+            items={[
+              { id: 'colour', label: 'A colour' },
+              { id: 'box', label: 'A box' },
+              { id: 'none', label: 'Nothing' },
+            ]}
+          />
+        </Field>
+        {highlightMode === 'box' && (
+          <ColorField label="Box" value={eff.highlight.box_color} onChange={(v) => setOverride('highlight.box_color', v)} />
+        )}
+        {highlightWarning && <p className="field__hint field__hint--warn">{highlightWarning}</p>}
+
+        <div className="grid-2">
+          <Slider label="Text size" value={eff.font.size} min={40} max={220} step={2} onChange={(v) => setOverride('font.size', v)} />
+          <Slider label="Outline thickness" value={eff.outline_width} min={0} max={20} step={0.5} onChange={(v) => setOverride('outline_width', v)} />
+          <Slider label="Words on screen at once" value={eff.layout.words_per_chunk} min={1} max={8} step={1} onChange={(v) => setOverride('layout.words_per_chunk', v)} />
+        </div>
+
+        <Switch label="All capital letters" checked={eff.font.uppercase} onChange={(v) => setOverride('font.uppercase', v)} />
+
+        <div className="grid-2">
+          <Field label="Lines">
+            <Segmented
+              label="Maximum lines"
+              value={String(eff.layout.max_lines) as '1' | '2'}
+              onChange={(v) => setOverride('layout.max_lines', Number(v))}
               items={[
-                { id: 'colour', label: 'Colour' },
-                { id: 'box', label: 'Box' },
-                { id: 'none', label: 'Nothing' },
+                { id: '1', label: '1 line' },
+                { id: '2', label: '2 lines' },
               ]}
             />
           </Field>
-          {highlightMode === 'box' && (
-            <ColorField label="Box" value={eff.highlight.box_color} onChange={(v) => setOverride('highlight.box_color', v)} />
-          )}
-          {highlightWarning && <p className="field__hint">{highlightWarning}</p>}
-
-          <div className="grid-2">
-            <Slider label="Font size" value={eff.font.size} min={40} max={220} step={2} onChange={(v) => setOverride('font.size', v)} />
-            <Slider label="Outline width" value={eff.outline_width} min={0} max={20} step={0.5} onChange={(v) => setOverride('outline_width', v)} />
-            <Slider label="Words per caption" value={eff.layout.words_per_chunk} min={1} max={8} step={1} onChange={(v) => setOverride('layout.words_per_chunk', v)} />
-          </div>
-
-          <Switch label="Capital letters" checked={eff.font.uppercase} onChange={(v) => setOverride('font.uppercase', v)} />
-
-          <Field label="Where the text sits">
-            <div className="placement-row">
-              <PlacementPad
-                position={eff.layout.position}
-                align={eff.layout.align_x}
-                wide={!!fmt && !!fmt.width && !!fmt.height && fmt.width > fmt.height}
-                onPick={(p, a) => {
-                  setOverride('layout.position', p)
-                  setOverride('layout.align_x', a)
-                }}
-              />
-              <div className="stack">
-                <Slider label="Move left / right" value={eff.layout.offset_x} min={-xRange} max={xRange} step={10} onChange={(v) => setOverride('layout.offset_x', v)} format={(v) => `${v > 0 ? '+' : ''}${v} px`} />
-                <Slider label="Move up / down" value={eff.layout.offset_y} min={-400} max={400} step={10} onChange={(v) => setOverride('layout.offset_y', v)} format={(v) => `${v > 0 ? '+' : ''}${v} px`} />
-              </div>
-            </div>
-            <p className="field__hint">Pick a spot, then nudge it. Captions stay inside the platform safe zones unless you move them out.</p>
+          <Field label="How words appear">
+            <Segmented
+              label="Caption entrance"
+              value={eff.animation.in}
+              onChange={(v) => setOverride('animation.in', v)}
+              items={[
+                { id: 'none', label: 'Instantly' },
+                { id: 'pop', label: 'Pop' },
+                { id: 'bounce', label: 'Bounce' },
+                { id: 'fade', label: 'Fade' },
+              ]}
+            />
           </Field>
-          <div className="grid-2">
-            <Field label="Lines">
-              <Tabs
-                label="Maximum lines"
-                value={String(eff.layout.max_lines) as '1' | '2'}
-                onChange={(v) => setOverride('layout.max_lines', Number(v))}
-                items={[
-                  { id: '1', label: '1 line' },
-                  { id: '2', label: '2 lines' },
-                ]}
-              />
-            </Field>
-            <Field label="Entrance">
-              <Tabs
-                label="Caption entrance"
-                value={eff.animation.in}
-                onChange={(v) => setOverride('animation.in', v)}
-                items={[
-                  { id: 'none', label: 'None' },
-                  { id: 'pop', label: 'Pop' },
-                  { id: 'bounce', label: 'Bounce' },
-                  { id: 'fade', label: 'Fade' },
-                ]}
-              />
-            </Field>
-          </div>
+        </div>
+      </Setting>
 
-          <div className="fine__foot">
-            <Button variant="secondary" disabled={!dirty} onClick={clearOverrides}>
-              Reset to preset
-            </Button>
-            <form
-              className="inline-form"
-              onSubmit={(e) => {
-                e.preventDefault()
-                if (name.trim()) void save()
-              }}
-            >
-              <div className="field field--grow">
-                <label className="field__label" htmlFor="preset-name">
-                  Save these settings as
-                </label>
-                <input id="preset-name" className="input" value={name} maxLength={60} placeholder="My bold look" onChange={(e) => setName(e.target.value)} />
-              </div>
-              <Button variant="secondary" type="submit" disabled={!name.trim()}>
-                Save style
-              </Button>
-            </form>
+      <Setting title="Position on screen" value={placeName}>
+        <div className="placement-row">
+          <PlacementPad
+            position={eff.layout.position}
+            align={eff.layout.align_x}
+            wide={!!fmt && !!fmt.width && !!fmt.height && fmt.width > fmt.height}
+            onPick={(p, a) => {
+              setOverride('layout.position', p)
+              setOverride('layout.align_x', a)
+            }}
+          />
+          <div className="stack">
+            <p className="field__hint">Tap a spot on this map of the screen, then nudge it if you need to.</p>
+            <Slider label="Move left or right" value={eff.layout.offset_x} min={-xRange} max={xRange} step={10} onChange={(v) => setOverride('layout.offset_x', v)} format={(v) => (v === 0 ? 'No change' : `${v > 0 ? '+' : ''}${v}`)} />
+            <Slider label="Move up or down" value={eff.layout.offset_y} min={-400} max={400} step={10} onChange={(v) => setOverride('layout.offset_y', v)} format={(v) => (v === 0 ? 'No change' : `${v > 0 ? '+' : ''}${v}`)} />
           </div>
         </div>
-      </details>
-    </Card>
+        <p className="field__hint">Captions stay clear of the app buttons unless you move them there.</p>
+      </Setting>
+
+      {dirty && (
+        <div className="save-style">
+          <form
+            className="inline-form"
+            onSubmit={(e) => {
+              e.preventDefault()
+              if (name.trim()) void save()
+            }}
+          >
+            <div className="field field--grow">
+              <label className="field__label" htmlFor="preset-name">
+                Keep these changes as a new style
+              </label>
+              <input id="preset-name" className="input" value={name} maxLength={60} placeholder="Give it a name" onChange={(e) => setName(e.target.value)} />
+            </div>
+            <Button variant="secondary" type="submit" disabled={!name.trim()}>
+              Save style
+            </Button>
+          </form>
+          <Button variant="text" onClick={clearOverrides}>
+            Undo my changes
+          </Button>
+        </div>
+      )}
+    </>
   )
 }
+
+const BACKGROUND_NAME = { solid: 'Plain colour', transparent: 'See-through', image: 'Picture', video: 'Video' } as const
 
 function BackgroundPicker() {
   const { background, setBackground, setExport } = useDraft()
@@ -412,24 +441,23 @@ function BackgroundPicker() {
   }
 
   return (
-    <Card className="stack" as="section">
-      <h2 className="title">Background</h2>
-      <Tabs
+    <Setting title="Background" value={BACKGROUND_NAME[type]}>
+      <Segmented
         label="Background type"
         value={type}
         onChange={choose}
         items={[
-          { id: 'solid', label: 'Colour' },
-          { id: 'transparent', label: 'Transparent overlay' },
-          { id: 'image', label: 'Image' },
-          { id: 'video', label: 'Video loop' },
+          { id: 'solid', label: 'Plain colour' },
+          { id: 'image', label: 'Picture' },
+          { id: 'video', label: 'Video' },
+          { id: 'transparent', label: 'See-through' },
         ]}
       />
       {type === 'solid' && <ColorField label="Background colour" value={background.color} onChange={(v) => setBackground({ color: v })} />}
       {type === 'transparent' && (
-        <p className="muted">
-          Exports captions on a transparent background so you can lay them over footage in CapCut, Premiere or DaVinci
-          Resolve. The preview shows a neutral grey instead.
+        <p className="field__hint">
+          Only the captions are exported, with nothing behind them, so you can lay them over your own footage in an
+          editor such as CapCut, Premiere or DaVinci Resolve. The preview shows grey behind them.
         </p>
       )}
       {(type === 'image' || type === 'video') && (
@@ -447,32 +475,42 @@ function BackgroundPicker() {
           />
           <div className="row">
             <Button variant="secondary" busy={busy} onClick={() => fileRef.current?.click()}>
-              {background.fileName && background.path ? 'Replace file' : `Choose ${type === 'image' ? 'an image' : 'a video'}`}
+              {background.fileName && background.path ? 'Choose another file' : `Choose ${type === 'image' ? 'a picture' : 'a video'}`}
             </Button>
-            <span className="muted">{background.path ? background.fileName : 'The file is used as a full-frame background.'}</span>
+            <span className="field__hint">{background.path ? background.fileName : 'It fills the whole frame, behind the captions.'}</span>
           </div>
           <div className="grid-2">
-            <Slider label="Blur" value={background.blur} min={0} max={30} step={1} onChange={(v) => setBackground({ blur: v })} />
+            <Slider label="Blur" value={background.blur} min={0} max={30} step={1} onChange={(v) => setBackground({ blur: v })} format={(v) => (v === 0 ? 'None' : String(v))} />
             <Slider label="Darken" value={background.darken} min={0} max={1} step={0.05} onChange={(v) => setBackground({ darken: v })} format={(v) => `${Math.round(v * 100)}%`} />
           </div>
         </>
       )}
-    </Card>
+    </Setting>
   )
 }
 
 export function CaptionsStep() {
   return (
-    <div className="stack stack--lg">
+    <div className="step">
       <header className="step-head">
-        <h1 className="display">Style the captions</h1>
-        <p className="lede">The preview frame is rendered from your own script and updates as you choose.</p>
+        <h1 className="display">How should the captions look?</h1>
+        <p className="lede">Pick a style. The preview shows your own words and changes as you choose.</p>
       </header>
       <FormatPicker />
       <PresetGrid />
-      <FontGrid />
-      <FineTune />
-      <BackgroundPicker />
+      <section className="section" aria-labelledby="adjust-title">
+        <div className="section__head">
+          <h2 className="section__title" id="adjust-title">
+            Adjust the details
+          </h2>
+          <p className="section__hint">Optional. Open any row to change it.</p>
+        </div>
+        <div className="settings">
+          <FontGrid />
+          <FineTune />
+          <BackgroundPicker />
+        </div>
+      </section>
     </div>
   )
 }

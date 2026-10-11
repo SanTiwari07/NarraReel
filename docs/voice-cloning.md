@@ -42,7 +42,11 @@ You can record and save voices **without** the cloning engine installed. Only sp
 
 Override with `NARRAREEL_CLONE_MODEL=original|turbo|multilingual` and `NARRAREEL_DEVICE=cpu|cuda|mps`.
 
-The first run downloads about 2 GB of weights from Hugging Face. Speed is applied by time-stretching
+The first run downloads the weights from Hugging Face: about 3 GB for the original model and 4 GB for Turbo.
+The app asks where to keep them (My own voice, "Where should the voice model be kept?"), so they do not have to go on a
+full system drive; changing the folder later moves what is already downloaded. Outside the app, set
+`NARRAREEL_MODEL_DIR` to a folder such as `D:\NarraReel models` (the weights go in its `huggingface` subfolder).
+Speed is applied by time-stretching
 (the model has no speed control). Energy maps to the model's `exaggeration` and `cfg_weight` on the original and
 multilingual models; the Turbo model has no such control, so there energy only changes the audio processing.
 
@@ -60,7 +64,9 @@ a minute for a short sentence on CPU; a GPU or the Colab notebook is much faster
 Install notes (checked on 2026-10-10): `chatterbox-tts` 0.1.7 resolves on Python 3.13 and pins `torch==2.6.0`.
 Its pins can clash with other packages, so install the `clone` extra in its own virtual environment if you hit
 conflicts. The `clone` extra pins `setuptools<81`: Chatterbox's watermarking package imports `pkg_resources`, which
-newer setuptools no longer ships, and without it the model fails to load. On Windows the PyPI `torch` wheel is CPU-only; for a GPU follow the PyTorch install selector first.
+newer setuptools no longer ships, and without it the model fails to load. Another install can still upgrade setuptools
+later, so NarraReel also supplies the one function the watermarker needs when `pkg_resources` is missing; the
+watermark stays on either way. On Windows the PyPI `torch` wheel is CPU-only; for a GPU follow the PyTorch install selector first.
 
 ## Free GPU: Google Colab
 

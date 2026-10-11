@@ -31,7 +31,7 @@ RERENDER_FILES = ("voice.wav", "voice.mp3", "words.json", "project.json", "capti
 @dataclass
 class Job:
     id: str
-    kind: str = "video"  # "video" | "prepare"
+    kind: str = "video"  # "video" | "prepare" | "install"
     status: Status = "queued"
     events: list[ProgressEvent] = field(default_factory=list)
     error: str | None = None

@@ -49,8 +49,8 @@ describe('App', () => {
         <App />
       </MemoryRouter>,
     )
-    expect(await screen.findByRole('heading', { name: /write or paste your script/i })).toBeInTheDocument()
-    const next = screen.getByRole('button', { name: /continue to duration/i })
+    expect(await screen.findByRole('heading', { name: /what should your video say/i })).toBeInTheDocument()
+    const next = screen.getByRole('button', { name: /next: choose a voice/i })
     expect(next).toBeDisabled()
     expect(screen.getByText(/add a script first/i)).toBeInTheDocument()
   })
@@ -63,8 +63,8 @@ describe('App', () => {
     )
     const box = await screen.findByLabelText('Script')
     fireEvent.change(box, { target: { value: 'One two three four five.' } })
-    await waitFor(() => expect(screen.getByText(/1 sentences/)).toBeInTheDocument(), { timeout: 3000 })
-    expect(screen.getByRole('button', { name: /continue to duration/i })).toBeEnabled()
+    await waitFor(() => expect(screen.getByText(/in 1 sentence\./)).toBeInTheDocument(), { timeout: 3000 })
+    expect(screen.getByRole('button', { name: /next: choose a voice/i })).toBeEnabled()
   })
 
   it('marks the current step in the navigation', async () => {
@@ -73,7 +73,7 @@ describe('App', () => {
         <App />
       </MemoryRouter>,
     )
-    const link = await screen.findByRole('link', { name: /voice/i })
+    const link = await screen.findByRole('link', { name: 'Voice' })
     expect(link).toHaveAttribute('aria-current', 'page')
   })
 })

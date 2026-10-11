@@ -57,7 +57,9 @@
   --text-display-lg: clamp(2.25rem, 1.4rem + 4vw, 3.5rem);
   --text-display-md: clamp(1.75rem, 1.25rem + 2.3vw, 2.5rem);
   --text-display-sm: clamp(1.5rem, 1.2rem + 1.4vw, 2rem);
-  --text-title-lg: 1.5rem;
+  --text-step: clamp(1.75rem, 1.35rem + 1.3vw, 2.25rem); /* one heading per step */
+  --text-lede: 1.0625rem;
+  --text-title-lg: 1.375rem;
   --text-title-md: 1.125rem;
   --text-title-sm: 1rem;
   --text-body-md: 1rem;
@@ -71,9 +73,13 @@
   --tracking-sm: -0.0625rem;
   --tracking-title: -0.01875rem;
 
-  /* the page is 80rem wide on laptops and grows with the screen on 2K, 4K and ultrawide */
-  --container: clamp(80rem, 72vw, 150rem);
+  /* Controls on the left, the video preview on the right. Sized in rem, so the whole
+     workspace grows with the root font size on 2K and 4K screens and stays centred. */
+  --workspace: 74rem;
+  --rail: 20rem;
+  --gutter: var(--space-lg);
   --nav-height: 4rem;
+  --bar-height: 4.5rem; /* the Back / Next bar pinned to the bottom */
   --touch-target: 2.75rem; /* 44 px: the smallest comfortable tap size */
 
   --safe-left: env(safe-area-inset-left, 0px);

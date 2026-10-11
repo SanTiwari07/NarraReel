@@ -14,6 +14,7 @@ import logging
 import mimetypes
 import re
 from collections.abc import AsyncIterator
+from dataclasses import asdict
 from pathlib import Path
 from typing import Any
 
@@ -24,7 +25,7 @@ from fastapi.responses import FileResponse, JSONResponse, Response
 from sse_starlette.sse import EventSourceResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from .. import __version__, config
+from .. import __version__, config, model_store
 from .. import voices as voices_mod
 from ..audio import ffmpeg as ff
 from ..captions import fonts as fonts_mod
@@ -36,7 +37,7 @@ from ..captions.styles import (
     resolve_style,
     save_user_style,
 )
-from ..engines import registry
+from ..engines import installer, registry
 from ..errors import (
     DependencyMissing,
     EngineError,
@@ -71,7 +72,13 @@ SAMPLE_TEXT = {
 
 def _status_for(exc: NarraReelError) -> int:
     if isinstance(
-        exc, ScriptError | StyleError | FormatError | fonts_mod.FontError | voices_mod.VoiceProfileError
+        exc,
+        ScriptError
+        | StyleError
+        | FormatError
+        | fonts_mod.FontError
+        | voices_mod.VoiceProfileError
+        | model_store.StorageError,
     ):
         return 422
     if isinstance(exc, EngineUnavailable | DependencyMissing):
@@ -102,6 +109,7 @@ def create_app(
     demo: bool = False,
 ) -> FastAPI:
     runner = runner or JobRunner()
+    model_store.apply()  # downloads go to the model folder the person chose
 
     @contextlib.asynccontextmanager
     async def lifespan(_: FastAPI):
@@ -136,7 +144,8 @@ def create_app(
             blocked = (
                 request.method != "GET"
                 and path.startswith(("/api/fonts", "/api/backgrounds", "/api/voices/clone",
-                                    "/api/voices/custom", "/api/engines/", "/api/presets/styles"))
+                                    "/api/voices/custom", "/api/engines/", "/api/presets/styles",
+                                    "/api/storage"))
             )  # fmt: skip
             if blocked:
                 return _error(
@@ -214,6 +223,51 @@ def create_app(
             return {"engine": engine_id}
 
         return S.TaskCreated(task_id=runner.submit_task("prepare", run).id)
+
+    @app.post("/api/engines/{engine_id}/install", response_model=S.TaskCreated, tags=["voices"])
+    def install_engine(engine_id: str) -> S.TaskCreated:
+        extra = installer.EXTRAS.get(engine_id)
+        if extra is None:
+            raise EngineError(f"'{engine_id}' has nothing to install.")
+        if registry.get_engine(engine_id).status().available:
+            raise EngineError(f"'{engine_id}' is already installed.")
+
+        def run(progress, cancel):
+            def on(fraction: float, message: str) -> None:
+                progress(ProgressEvent(stage="prepare", fraction=fraction, message=message))
+
+            installer.install_extra(extra, on, cancel)
+            return {"engine": engine_id}
+
+        return S.TaskCreated(task_id=runner.submit_task("install", run).id)
+
+    # ------------------------------------------------------------- storage
+
+    @app.get("/api/storage/models", response_model=S.ModelStorage, tags=["system"])
+    def model_storage() -> S.ModelStorage:
+        return S.ModelStorage(**asdict(model_store.info()))
+
+    @app.post("/api/storage/models/browse", response_model=S.FolderPicked, tags=["system"])
+    def browse_model_folder() -> S.FolderPicked:
+        # opens the system folder window on the computer NarraReel runs on
+        return S.FolderPicked(path=model_store.pick_folder(model_store.info().path))
+
+    @app.post("/api/storage/models/keep", response_model=S.ModelStorage, tags=["system"])
+    def keep_model_folder() -> S.ModelStorage:
+        return S.ModelStorage(**asdict(model_store.keep_default()))
+
+    @app.put("/api/storage/models", response_model=S.TaskCreated, tags=["system"])
+    def set_model_storage(req: S.ModelFolderRequest) -> S.TaskCreated:
+        root = model_store.check_location(req.path)  # fails fast: bad path, read-only, no room
+
+        def run(progress, cancel):
+            def on(fraction: float, message: str) -> None:
+                progress(ProgressEvent(stage="prepare", fraction=fraction, message=message))
+
+            leftovers = model_store.set_location(root, on)
+            return {"path": str(root), "leftovers": leftovers}
+
+        return S.TaskCreated(task_id=runner.submit_task("storage", run).id)
 
     # -------------------------------------------------------------- voices
 

@@ -6,14 +6,15 @@ import { useCatalog } from '../state/catalog'
 import { useSession } from '../state/session'
 import { toProject, useDraft } from '../state/project'
 import { useScriptInfo } from '../state/scriptInfo'
-import { Button, Stat } from './ui'
+import { PhoneFrame } from './PhoneFrame'
+import { Button } from './ui'
 
+/** The four things a person decides, in the order they decide them. */
 export const STEPS = [
-  { path: '/script', label: 'Script' },
-  { path: '/duration', label: 'Duration' },
-  { path: '/voice', label: 'Voice' },
-  { path: '/captions', label: 'Captions' },
-  { path: '/export', label: 'Export' },
+  { path: '/script', label: 'Script', next: 'Next: choose a voice' },
+  { path: '/voice', label: 'Voice', next: 'Next: style the captions' },
+  { path: '/captions', label: 'Captions', next: 'Next: make the video' },
+  { path: '/export', label: 'Make video', next: '' },
 ] as const
 
 function Logo() {
@@ -27,6 +28,39 @@ function Logo() {
       </svg>
       <span className="brand__name">NarraReel</span>
     </span>
+  )
+}
+
+function Check() {
+  return (
+    <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
+      <path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+function Stepper() {
+  const { pathname } = useLocation()
+  const current = STEPS.findIndex((s) => s.path === pathname)
+  return (
+    <nav className="stepper" aria-label="Steps">
+      <ol className="stepper__list">
+        {STEPS.map((s, i) => {
+          const state = i < current ? 'done' : i === current ? 'now' : 'todo'
+          return (
+            <li key={s.path} className={`stepper__item stepper__item--${state}`}>
+              <NavLink to={s.path} className="stepper__link">
+                <span className="stepper__dot" aria-hidden="true">
+                  {state === 'done' ? <Check /> : i + 1}
+                </span>
+                <span className="stepper__label">{s.label}</span>
+                {state === 'done' && <span className="sr-only"> (done)</span>}
+              </NavLink>
+            </li>
+          )
+        })}
+      </ol>
+    </nav>
   )
 }
 
@@ -63,16 +97,7 @@ export function TopNav() {
         <NavLink to="/script" className="nav__home" aria-label="NarraReel home">
           <Logo />
         </NavLink>
-        <nav className="steps" aria-label="Steps">
-          {STEPS.map((s, i) => (
-            <NavLink key={s.path} to={s.path} className={({ isActive }) => `step-tab ${isActive ? 'step-tab--active' : ''}`}>
-              <span className="step-tab__num" aria-hidden="true">
-                {i + 1}
-              </span>
-              {s.label}
-            </NavLink>
-          ))}
-        </nav>
+        <Stepper />
         <div className="nav__actions">
           <input
             ref={fileRef}
@@ -85,10 +110,10 @@ export function TopNav() {
               e.target.value = ''
             }}
           />
-          <Button variant="text" onClick={() => fileRef.current?.click()}>
+          <Button variant="text" onClick={() => fileRef.current?.click()} title="Open a saved project file">
             Open project
           </Button>
-          <Button variant="text" onClick={saveProject}>
+          <Button variant="text" onClick={saveProject} title="Save everything to a file you can open later">
             Save project
           </Button>
         </div>
@@ -97,22 +122,50 @@ export function TopNav() {
   )
 }
 
-export function SummaryBar() {
+/** What the video is made of so far. Each line jumps back to the step that sets it. */
+function Recipe() {
   const info = useScriptInfo()
-  const { voice, targetSeconds, format } = useDraft()
+  const { voice, targetSeconds, format, captions, script } = useDraft()
   const voices = useCatalog((s) => s.voices)
   const formats = useCatalog((s) => s.formats)
-  const voiceName = voices.find((v) => v.engine === voice.engine && v.id === voice.voice_id)?.name ?? voice.voice_id.split('-').at(-1)?.replace('Neural', '')
+  const styles = useCatalog((s) => s.styles)
+  const voiceName =
+    voices.find((v) => v.engine === voice.engine && v.id === voice.voice_id)?.name ??
+    voice.voice_id.split('-').at(-1)?.replace('Neural', '')
   const fmt = formats.find((f) => f.id === format)
+  const style = styles.find((s) => s.id === captions.preset)
   const a = info.analysis.data
+  const hasScript = !!script.trim() && !!a && a.word_count > 0
+  const length = targetSeconds ? formatDuration(targetSeconds) : hasScript ? `About ${formatDuration(a.estimate.total_seconds)}` : null
+
+  const rows = [
+    { to: '/script', label: 'Script', value: hasScript ? `${a.word_count} words` : null, empty: 'Not written yet' },
+    { to: '/script', label: 'Length', value: length, empty: 'Set by your script' },
+    { to: '/voice', label: 'Voice', value: voiceName ?? null, empty: 'Not chosen' },
+    { to: '/captions', label: 'Captions', value: style?.name ?? null, empty: 'Not chosen' },
+    { to: '/captions', label: 'Format', value: fmt ? fmt.name.split(' (')[0].split(' / ')[0] : null, empty: 'Not chosen' },
+  ]
   return (
-    <section className="summary" aria-label="Project summary">
-      <Stat value={a ? String(a.word_count) : '0'} label="words" tone="white" />
-      <Stat value={a ? formatDuration(a.estimate.total_seconds) : '–'} label="length at 1.0×" />
-      <Stat value={targetSeconds ? formatDuration(targetSeconds) : 'Open'} label="target" />
-      <Stat value={voiceName ?? '–'} label="voice" tone="white" />
-      <Stat value={fmt ? fmt.name.split(' (')[0].split(' / ')[0] : '–'} label="format" tone="white" />
-    </section>
+    <ul className="recipe" aria-label="Your video so far">
+      {rows.map((r) => (
+        <li key={r.label}>
+          <NavLink to={r.to} className="recipe__row">
+            <span className="recipe__label">{r.label}</span>
+            <span className={r.value ? 'recipe__value' : 'recipe__value recipe__value--empty'}>{r.value ?? r.empty}</span>
+          </NavLink>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+/** The right-hand column on every step: the video as it stands, and what it is made of. */
+export function ReelRail() {
+  return (
+    <div className="rail">
+      <PhoneFrame />
+      <Recipe />
+    </div>
   )
 }
 
@@ -125,23 +178,25 @@ export function StepNav() {
   const prev = STEPS[i - 1]
   const next = STEPS[i + 1]
   const blocked = i === 0 && !script.trim()
+  // the last step draws its own bar, because its forward action is making the video
+  if (!next) return null
   return (
     <div className="step-nav">
-      {prev ? (
-        <Button variant="secondary" onClick={() => navigate(prev.path)}>
-          Back to {prev.label.toLowerCase()}
-        </Button>
-      ) : (
-        <span />
-      )}
-      {next && (
+      <div className="step-nav__inner">
+        {prev ? (
+          <Button variant="text" onClick={() => navigate(prev.path)}>
+            Back
+          </Button>
+        ) : (
+          <span />
+        )}
         <div className="step-nav__next">
           {blocked && <span className="step-nav__error">Add a script first.</span>}
-          <Button variant="primary" disabled={blocked} onClick={() => navigate(next.path)}>
-            Continue to {next.label.toLowerCase()}
+          <Button variant="primary" className="btn--lg" disabled={blocked} onClick={() => navigate(next.path)}>
+            {STEPS[i].next}
           </Button>
         </div>
-      )}
+      </div>
     </div>
   )
 }

@@ -414,3 +414,28 @@ def test_cli_clone_requires_consent_and_saves(tmp_path):
     assert "chatterbox:me" in ok.output and "Length" in ok.output
     assert [p.id for p in voices.list_profiles()] == ["me"]
     assert runner.invoke(cli_app, ["clone", "nope.wav", "--name", "x", "--i-have-consent"]).exit_code == 1
+
+
+def test_perth_gets_pkg_resources_when_setuptools_dropped_it(monkeypatch):
+    # setuptools 81+ has no pkg_resources; resemble-perth then sets its watermarker to None (D31)
+    monkeypatch.setitem(sys.modules, "pkg_resources", None)  # makes `import pkg_resources` fail
+    perth = types.ModuleType("perth")
+    perth.PerthImplicitWatermarker = None
+    reloaded = []
+    monkeypatch.setitem(sys.modules, "perth", perth)
+    monkeypatch.setattr(cb.importlib, "reload", lambda m: reloaded.append(m) or m)
+    cb._ensure_pkg_resources()
+    shim = sys.modules["pkg_resources"]
+    assert shim.resource_filename("narrareel", "presets").replace("\\", "/").endswith("narrareel/presets")
+    assert reloaded == [perth]  # perth is re-imported so it picks the stand-in up
+
+
+def test_missing_watermarker_is_reported_plainly(monkeypatch):
+    perth = types.ModuleType("perth")
+    perth.PerthImplicitWatermarker = None
+    monkeypatch.setitem(sys.modules, "perth", perth)
+    monkeypatch.setitem(sys.modules, "perth.perth_net.perth_net_implicit.perth_watermarker", None)
+    with pytest.raises(cb.WatermarkerMissing, match="resemble-perth.*pip install"):
+        cb._check_watermarker()
+    perth.PerthImplicitWatermarker = object
+    cb._check_watermarker()  # a working watermarker passes

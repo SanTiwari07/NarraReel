@@ -1,5 +1,6 @@
 import io
 import json
+import sys
 import time
 
 import pytest
@@ -122,7 +123,8 @@ def test_voice_preview_audio(client):
     assert len(r.content) > 2000
 
 
-def test_voice_preview_unavailable_engine(client):
+def test_voice_preview_unavailable_engine(client, monkeypatch):
+    monkeypatch.setitem(sys.modules, "chatterbox", None)  # as if the clone extra were not installed
     r = client.post("/api/preview/voice", json={"text": SCRIPT, "voice": {"engine": "chatterbox", "voice_id": "x"}})
     assert r.status_code in (409, 400)
 

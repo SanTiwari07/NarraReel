@@ -1,12 +1,10 @@
 import { useEffect } from 'react'
 import { Navigate, Outlet, Route, Routes, useLocation } from 'react-router-dom'
-import { PhoneFrame } from './components/PhoneFrame'
-import { StepNav, SummaryBar, TopNav, Toasts } from './components/Shell'
+import { ReelRail, StepNav, TopNav, Toasts } from './components/Shell'
 import { Banner, Button } from './components/ui'
 import { ScriptInfoProvider } from './state/scriptInfo'
 import { useCatalog } from './state/catalog'
 import { CaptionsStep } from './steps/CaptionsStep'
-import { DurationStep } from './steps/DurationStep'
 import { ExportStep } from './steps/ExportStep'
 import { ScriptStep } from './steps/ScriptStep'
 import { VoiceStep } from './steps/VoiceStep'
@@ -17,8 +15,8 @@ function Layout() {
   useEffect(() => {
     void load()
   }, [load])
-  // the frame is the payoff of the caption choices, so it stays next to them
-  const withPreview = pathname === '/captions' || pathname === '/export'
+  // on phones the frame only earns its space where the choices change how it looks
+  const stepClass = `workspace--${pathname.slice(1) || 'script'}`
 
   useEffect(() => {
     window.scrollTo({ top: 0 })
@@ -31,7 +29,6 @@ function Layout() {
       </a>
       <TopNav />
       <main id="main" className="page">
-        <SummaryBar />
         {error && (
           <Banner
             tone="error"
@@ -42,7 +39,7 @@ function Layout() {
               </Button>
             }
           >
-            {error}
+            {error} Check that NarraReel is still running on your computer.
           </Banner>
         )}
         {health?.demo && (
@@ -52,20 +49,18 @@ function Layout() {
           </Banner>
         )}
         {loaded && (
-          <div className={`layout ${withPreview ? 'layout--split' : ''}`}>
-            <div className="layout__main">
+          <div className={`workspace ${stepClass}`}>
+            <div className="workspace__main">
               <Outlet />
-              <StepNav />
             </div>
-            {withPreview && (
-              <div className="layout__aside">
-                <PhoneFrame />
-              </div>
-            )}
+            <aside className="workspace__rail" aria-label="Your video">
+              <ReelRail />
+            </aside>
           </div>
         )}
-        {!loaded && !error && <p className="muted">Loading…</p>}
+        {!loaded && !error && <p className="loading">Loading…</p>}
       </main>
+      {loaded && <StepNav />}
       <Toasts />
     </>
   )
@@ -78,7 +73,8 @@ export default function App() {
         <Route element={<Layout />}>
           <Route index element={<Navigate to="/script" replace />} />
           <Route path="/script" element={<ScriptStep />} />
-          <Route path="/duration" element={<DurationStep />} />
+          {/* length now lives with the script; old links still land somewhere sensible */}
+          <Route path="/duration" element={<Navigate to="/script" replace />} />
           <Route path="/voice" element={<VoiceStep />} />
           <Route path="/captions" element={<CaptionsStep />} />
           <Route path="/export" element={<ExportStep />} />

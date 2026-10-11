@@ -49,10 +49,10 @@ export function Badge({
 }
 
 const QUALITY_LABEL: Record<Quality, string> = {
-  natural: 'Natural',
-  noticeable: 'Noticeable',
-  strong: 'Strong',
-  not_recommended: 'Not recommended',
+  natural: 'Sounds natural',
+  noticeable: 'Slightly noticeable',
+  strong: 'Clearly noticeable',
+  not_recommended: 'Sounds unnatural',
 }
 const QUALITY_TONE: Record<Quality, 'good' | 'warn' | 'bad' | 'plain'> = {
   natural: 'good',
@@ -95,6 +95,38 @@ export function Tabs<T extends string>({
           disabled={t.disabled}
           title={t.hint}
           className={`tab ${value === t.id ? 'tab--active' : ''}`}
+          onClick={() => onChange(t.id)}
+        >
+          {t.label}
+        </button>
+      ))}
+    </div>
+  )
+}
+
+/** One choice out of a few, shown side by side (energy, voice type, highlight style). */
+export function Segmented<T extends string>({
+  items,
+  value,
+  onChange,
+  label,
+}: {
+  items: TabItem<T>[]
+  value: T
+  onChange: (id: T) => void
+  label: string
+}) {
+  return (
+    <div className="segmented" role="radiogroup" aria-label={label}>
+      {items.map((t) => (
+        <button
+          key={t.id}
+          type="button"
+          role="radio"
+          aria-checked={value === t.id}
+          disabled={t.disabled}
+          title={t.hint}
+          className="segmented__item"
           onClick={() => onChange(t.id)}
         >
           {t.label}
@@ -278,24 +310,5 @@ export function CodeWindow({ title, children }: { title: string; children: strin
         <code>{children}</code>
       </pre>
     </figure>
-  )
-}
-
-export function Stat({
-  value,
-  label,
-  size = 'md',
-  tone = 'yellow',
-}: {
-  value: string
-  label: string
-  size?: 'md' | 'lg'
-  tone?: 'yellow' | 'white'
-}) {
-  return (
-    <div className={`stat stat--${size} stat--${tone}`}>
-      <span className="stat__value">{value}</span>
-      <span className="stat__label">{label}</span>
-    </div>
   )
 }

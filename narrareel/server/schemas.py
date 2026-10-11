@@ -95,6 +95,26 @@ class TaskCreated(BaseModel):
     task_id: str
 
 
+class ModelStorage(BaseModel):
+    """Where the voice-cloning model is (or will be) downloaded."""
+
+    path: str
+    default_path: str
+    chosen: bool
+    from_env: bool
+    free_gb: float | None
+    models_gb: float
+    needed_gb: float
+
+
+class ModelFolderRequest(BaseModel):
+    path: str = Field(min_length=1, max_length=1024)
+
+
+class FolderPicked(BaseModel):
+    path: str | None
+
+
 class ValidateProjectRequest(BaseModel):
     project: dict[str, Any]
 

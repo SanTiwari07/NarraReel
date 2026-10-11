@@ -8,6 +8,7 @@ import type {
   FormatInfo,
   Health,
   JobStatus,
+  ModelStorage,
   PlanResponse,
   Project,
   StylePreset,
@@ -110,6 +111,13 @@ export const api = {
   health: () => getJson<Health>('/api/health'),
   engines: () => getJson<EngineInfo[]>('/api/engines'),
   prepareEngine: (id: string) => postJson<{ task_id: string }>(`/api/engines/${id}/prepare`, {}),
+  installEngine: (id: string) => postJson<{ task_id: string }>(`/api/engines/${id}/install`, {}),
+  modelStorage: () => getJson<ModelStorage>('/api/storage/models'),
+  /** Opens the system folder window on the computer NarraReel runs on. */
+  browseModelFolder: () => postJson<{ path: string | null }>('/api/storage/models/browse', {}),
+  keepModelFolder: () => postJson<ModelStorage>('/api/storage/models/keep', {}),
+  setModelFolder: async (path: string): Promise<{ task_id: string }> =>
+    (await send('/api/storage/models', { ...json({ path }), method: 'PUT' })).json(),
   voices: (engine?: string) =>
     getJson<Voice[]>(`/api/voices${engine ? `?engine=${encodeURIComponent(engine)}` : ''}`),
   fonts: () => getJson<FontInfo[]>('/api/fonts'),

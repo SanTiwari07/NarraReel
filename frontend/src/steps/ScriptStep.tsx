@@ -3,13 +3,16 @@ import { formatDuration } from '../lib/time'
 import { useDraft } from '../state/project'
 import { useScriptInfo } from '../state/scriptInfo'
 import { useSession } from '../state/session'
-import { Banner, Button, Card } from '../components/ui'
+import { Banner, Button } from '../components/ui'
+import { LengthSection } from './LengthSection'
 
 const LONG_SENTENCE = 35
 
+const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`
+
 export function ScriptStep() {
-  const { script, targetSeconds, patch } = useDraft()
-  const { analysis, plan } = useScriptInfo()
+  const { script, patch } = useDraft()
+  const { analysis } = useScriptInfo()
   const toast = useSession((s) => s.toast)
   const fileRef = useRef<HTMLInputElement>(null)
   const [dragging, setDragging] = useState(false)
@@ -23,20 +26,19 @@ export function ScriptStep() {
     patch({ script: (await file.text()).replace(/^﻿/, '') })
   }
 
-  const editOption = plan.data?.plan.options.find((o) => o.kind === 'edit_script')
   const longest = a ? Math.max(...a.sentences.map((s) => s.seconds), 1) : 1
 
   return (
-    <div className="stack stack--lg">
+    <div className="step">
       <header className="step-head">
-        <h1 className="display">Write or paste your script</h1>
+        <h1 className="display">What should your video say?</h1>
         <p className="lede">
-          NarraReel reads exactly what you write. Put each beat on its own line, and wrap a word in *asterisks* to make
-          it stand out in the captions.
+          Type or paste the words to be spoken. Start a new line for each new idea. To make a word stand out in the
+          captions, put *stars* around it.
         </p>
       </header>
 
-      <Card className={`script-card ${dragging ? 'script-card--drag' : ''}`}>
+      <div className={`script-box ${dragging ? 'script-box--drag' : ''}`}>
         <label htmlFor="script" className="sr-only">
           Script
         </label>
@@ -59,17 +61,15 @@ export function ScriptStep() {
             if (f) void readFile(f)
           }}
         />
-        <div className="script-card__foot">
+        <div className="script-box__foot">
           <p className="script-count" aria-live="polite">
             {a && a.word_count > 0 ? (
               <>
-                <strong>{a.word_count}</strong> words, {a.sentence_count} sentences, {a.paragraph_count} paragraph
-                {a.paragraph_count === 1 ? '' : 's'}. About <strong>{formatDuration(a.estimate.total_seconds)}</strong>{' '}
-                at 1.0×
-                {a.estimate.basis === 'default' && <span className="muted"> (estimate; it sharpens after your first video)</span>}
+                <strong>{plural(a.word_count, 'word')}</strong> in {plural(a.sentence_count, 'sentence')}. About{' '}
+                <strong>{formatDuration(a.estimate.total_seconds)}</strong> to read aloud.
               </>
             ) : (
-              <span className="muted">Nothing here yet. Type, paste, or drop a .txt or .md file.</span>
+              <>Nothing here yet. Type, paste, or drop in a text file.</>
             )}
           </p>
           <input
@@ -84,30 +84,21 @@ export function ScriptStep() {
             }}
           />
           <Button variant="secondary" onClick={() => fileRef.current?.click()}>
-            Choose a file
+            Open a text file
           </Button>
         </div>
-      </Card>
+      </div>
 
-      {targetSeconds && editOption && editOption.words_delta !== null && (
-        <Banner tone="info" title={`Target ${formatDuration(targetSeconds)}`}>
-          {editOption.words_delta === 0 || Math.abs(editOption.words_delta ?? 0) < 2
-            ? 'Your script fits the target at natural speed.'
-            : editOption.message}{' '}
-          The count updates as you type.
-        </Banner>
-      )}
-
-      {analysis.error && <Banner tone="error" title="Could not analyse the script">{analysis.error}</Banner>}
+      {analysis.error && <Banner tone="error" title="Could not read the script">{analysis.error}</Banner>}
 
       {a?.language_hint === 'hi' && (
-        <Banner tone="info" title="Hindi detected">
-          Pick a voice that speaks Hindi in the next steps, and choose Noto Sans Devanagari as the caption font.
+        <Banner tone="info" title="Your script is in Hindi">
+          Choose a voice that speaks Hindi next. On the captions step, pick Noto Sans Devanagari so every letter shows.
         </Banner>
       )}
 
       {a && a.warnings.length > 0 && (
-        <div className="stack" aria-label="Script warnings">
+        <div className="stack" aria-label="Things to check in your script">
           {a.warnings.map((w) => (
             <Banner key={`${w.code}-${w.sentence_idx ?? ''}`} tone="warn">
               {w.message}
@@ -116,9 +107,11 @@ export function ScriptStep() {
         </div>
       )}
 
-      {a && a.sentences.length > 0 && (
-        <details className="sentences">
-          <summary>Sentence by sentence ({a.sentences.length})</summary>
+      {a && a.sentences.length > 1 && (
+        <details className="disclosure">
+          <summary className="disclosure__summary">
+            <span>See how long each sentence takes</span>
+          </summary>
           <ol className="sentence-list">
             {a.sentences.map((s) => (
               <li key={s.idx} className="sentence">
@@ -137,6 +130,8 @@ export function ScriptStep() {
           </ol>
         </details>
       )}
+
+      <LengthSection />
     </div>
   )
 }

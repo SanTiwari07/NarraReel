@@ -35,6 +35,17 @@ export interface EngineInfo {
   }
 }
 
+/** Where the voice-cloning model is, or will be, downloaded. */
+export interface ModelStorage {
+  path: string
+  default_path: string
+  chosen: boolean
+  from_env: boolean
+  free_gb: number | null
+  models_gb: number
+  needed_gb: number
+}
+
 export type Quality = DurationOption['quality']
 export type VoiceProfile = S['VoiceProfile']
 export type QualityReport = S['QualityReport']

@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { api, customVoiceUrl } from '../api/client'
+import { create } from 'zustand'
+import { api, customVoiceUrl, watchJob } from '../api/client'
 import type { QualityReport, VoiceProfile } from '../api/types'
-import { Badge, Banner, Button, Card, CodeWindow, Field, Tabs } from '../components/ui'
+import { Badge, Banner, Button, Card, CodeWindow, Field, ProgressBar, Tabs } from '../components/ui'
 import { useRecorder } from '../hooks/useRecorder'
 import { useCatalog } from '../state/catalog'
 import { useDraft } from '../state/project'
 import { useSession } from '../state/session'
+import { ModelFolder } from './ModelFolder'
 
 type Tone = 'energetic' | 'calm' | 'hindi'
 
@@ -342,6 +344,66 @@ function CloneFlow({ onCreated }: { onCreated: (p: VoiceProfile) => void }) {
   )
 }
 
+// Lives outside the component so the progress survives switching tabs while the install runs.
+const useInstall = create<{ progress: { fraction: number; message: string } | null }>(() => ({ progress: null }))
+
+function startInstall() {
+  const { toast } = useSession.getState()
+  const { refreshEngines, refreshVoices } = useCatalog.getState()
+  const finish = (message: string | null, error?: string) => {
+    useInstall.setState({ progress: null })
+    if (error) toast('error', error)
+    else if (message) toast('success', message)
+  }
+  useInstall.setState({ progress: { fraction: 0, message: 'Starting' } })
+  api
+    .installEngine('chatterbox')
+    .then(({ task_id }) =>
+      watchJob(
+        task_id,
+        (e) => useInstall.setState({ progress: { fraction: e.fraction, message: e.message } }),
+        async (status) => {
+          if (status.status === 'done') {
+            await Promise.all([refreshEngines(), refreshVoices()])
+            finish('Voice cloning is ready.')
+          } else finish(null, status.error ?? 'The setup did not finish.')
+        },
+        () => finish(null, 'Lost connection to NarraReel during setup. Reload the page and try again.'),
+        'tasks',
+      ),
+    )
+    .catch((e: unknown) => finish(null, e instanceof Error ? e.message : 'Could not start the setup.'))
+}
+
+function SetUpCloning() {
+  const progress = useInstall((s) => s.progress)
+  return (
+    <Card className="stack">
+      <h2 className="title">Turn on voice cloning</h2>
+      <p className="muted">
+        One click, one time. It downloads what NarraReel needs to speak in your voice: about 3 GB, so it can take
+        several minutes. You can record your voice while you wait.
+      </p>
+      {progress ? (
+        <>
+          <ProgressBar fraction={progress.fraction} label="Setup progress" />
+          <p className="field__hint">{progress.message}. Keep this window open.</p>
+        </>
+      ) : (
+        <div>
+          <Button variant="primary" onClick={startInstall}>
+            Set up voice cloning
+          </Button>
+        </div>
+      )}
+      <details>
+        <summary className="field__hint">Rather use the terminal?</summary>
+        <CodeWindow title="Terminal">{'pip install "narrareel[clone]"'}</CodeWindow>
+      </details>
+    </Card>
+  )
+}
+
 export function MyVoicePanel() {
   const engine = useCatalog((s) => s.engines.find((e) => e.id === 'chatterbox'))
   const refreshVoices = useCatalog((s) => s.refreshVoices)
@@ -355,16 +417,8 @@ export function MyVoicePanel() {
 
   return (
     <div className="stack stack--lg">
-      {!available && (
-        <Card className="stack">
-          <h2 className="title">Install the cloning engine to speak with your voice</h2>
-          <p className="muted">
-            You can record and save voices now. Speaking with them needs the cloning model: a one-time install that works
-            best with a GPU. No GPU? Run it free in Google Colab (see the docs).
-          </p>
-          <CodeWindow title="Terminal">{'pip install "narrareel[clone]"'}</CodeWindow>
-        </Card>
-      )}
+      <ModelFolder />
+      {!available && <SetUpCloning />}
       <SavedVoices onChange={changed} />
       <CloneFlow onCreated={changed} />
       <p className="field__hint">
