@@ -3,6 +3,7 @@ import time
 import pytest
 
 from narrareel.script import analyze_script, synthesis_units
+from narrareel.script.analyze import detect_language
 
 
 def test_abbreviations_and_decimals():
@@ -34,6 +35,24 @@ def test_hindi():
     assert len(a.sentences) == 2
     assert a.language_hint == "hi"
     assert a.word_count == 6
+
+
+def test_tamil():
+    a = analyze_script("வணக்கம் உலகம். இது ஒரு சோதனை.")
+    assert len(a.sentences) == 2
+    assert a.language_hint == "ta"
+    assert a.word_count == 5
+
+
+def test_tamil_is_not_hindi_or_english():
+    assert detect_language("வணக்கம்") == "ta"
+    assert detect_language("नमस्ते") == "hi"
+    assert detect_language("hello") == "en"
+    assert detect_language("123 ...") == "unknown"
+
+
+def test_tamil_with_a_few_latin_words_is_still_tamil():
+    assert detect_language("இது ஒரு YouTube வீடியோ ஆகும்") == "ta"
 
 
 def test_dash_attaches_to_previous_word():
@@ -148,6 +167,12 @@ def test_warnings():
 def test_mixed_scripts_warning():
     a = analyze_script("Hello दुनिया.")
     assert "mixed_scripts" in {w.code for w in a.warnings}
+
+
+def test_mixed_tamil_latin_warning():
+    a = analyze_script("Hello உலகம்.")
+    warning = next(w for w in a.warnings if w.code == "mixed_scripts")
+    assert "Tamil" in warning.message
 
 
 def test_very_long_script_warning():

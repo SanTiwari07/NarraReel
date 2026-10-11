@@ -132,6 +132,19 @@ def test_plan_one_sentence_script():
     assert all(o.resulting_seconds > 0 for o in p.options)
 
 
+def test_default_cps_per_language():
+    assert d.default_cps("en") == 14.0
+    assert d.default_cps("hi") == 12.0
+    assert d.default_cps("ta") == 11.8
+    assert d.default_cps("unknown") == d.FALLBACK_CPS
+
+
+def test_tamil_script_gets_the_tamil_rate(tmp_path, monkeypatch):
+    monkeypatch.setenv("NARRAREEL_HOME", str(tmp_path))
+    a = analyze_script("வணக்கம் உலகம். இது ஒரு சோதனை.")
+    assert d.get_cps("edge:x", a.language_hint) == (11.8, "default")
+
+
 def test_calibration_roundtrip(tmp_path, monkeypatch):
     monkeypatch.setenv("NARRAREEL_HOME", str(tmp_path))
     assert d.get_cps("edge:x", "en") == (14.0, "default")
