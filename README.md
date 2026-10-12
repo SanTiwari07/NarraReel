@@ -1,4 +1,8 @@
-<h1 align="center">🎬 NarraReel</h1>
+<p align="center">
+  <img src="docs/assets/narrareel-logo-800.png" alt="NarraReel logo" width="96">
+</p>
+
+<h1 align="center">NarraReel</h1>
 
 <h3 align="center">Your script. Your voice. Captions people watch to the end.</h3>
 
@@ -18,20 +22,28 @@
 </p>
 
 <p align="center">
-  <a href="#-quick-start">Quick start</a> ·
-  <a href="#-why-narrareel">Features</a> ·
-  <a href="#-caption-styles">Caption styles</a> ·
-  <a href="#%EF%B8%8F-command-line">CLI</a> ·
-  <a href="#-how-it-works">How it works</a> ·
-  <a href="#%EF%B8%8F-roadmap">Roadmap</a>
+  <a href="#quick-start">Quick start</a> ·
+  <a href="#why-narrareel">Features</a> ·
+  <a href="#caption-styles">Caption styles</a> ·
+  <a href="#command-line">CLI</a> ·
+  <a href="#how-it-works">How it works</a> ·
+  <a href="#roadmap">Roadmap</a>
 </p>
 
-<br>
+---
+
+<p align="center">
+  <a href="https://youtu.be/9aqRHCLlM5k">
+    <img src="https://img.youtube.com/vi/9aqRHCLlM5k/hqdefault.jpg" alt="Watch the NarraReel demo on YouTube" width="560">
+  </a>
+  <br>
+  <sub><a href="https://youtu.be/9aqRHCLlM5k"><b>Watch the demo on YouTube</b></a></sub>
+</p>
 
 <table align="center">
   <tr>
-    <th>✍️ You write this</th>
-    <th>🎥 NarraReel makes this</th>
+    <th>You write this</th>
+    <th>NarraReel makes this</th>
   </tr>
   <tr>
     <td width="360" valign="middle">
@@ -59,9 +71,31 @@ your computer.</pre>
 
 <p align="center"><sub>The clip on the right was made by NarraReel from the text on the left. Nothing was edited by hand.</sub></p>
 
+<p align="center">
+  <a href="#quick-start"><b>Get started in 3 commands</b></a>
+  &nbsp;·&nbsp;
+  <a href="https://github.com/SanTiwari07/NarraReel/stargazers"><b>Star the project</b></a>
+</p>
+
 ---
 
-## ✨ Why NarraReel
+## Screenshots
+
+<p align="center">
+  <img src="docs/assets/screenshot-home.png" alt="NarraReel start screen" width="720">
+</p>
+
+<p align="center"><sub>The web app runs in your browser, on your computer.</sub></p>
+
+<p align="center">
+  <img src="docs/assets/presets.png" alt="Caption presets: bold-pop, highlighter, karaoke, neon, one-word, keyword-emphasis, boxed, typewriter, minimal, subtitle-classic" width="720">
+</p>
+
+<p align="center"><sub>Ten caption presets, all rendered from the same word timings.</sub></p>
+
+---
+
+## Why NarraReel
 
 Most faceless videos get skipped in the first two seconds. The voice sounds flat, the captions are a wall of
 text, and the clip is 7 seconds too long for the format. NarraReel fixes those three things for **the script you
@@ -70,12 +104,12 @@ already wrote**. It does not generate your content for you.
 <table>
   <tr>
     <td width="50%" valign="top">
-      <h3>🎙️ Your voice, with energy</h3>
+      <h3>Your voice, with energy</h3>
       Record 30 seconds and narrate everything in your own cloned voice. Then set the delivery anywhere from
       <i>calm</i> to <i>hype</i>. Prefer not to clone? Pick from free online voices or offline ones.
     </td>
     <td width="50%" valign="top">
-      <h3>⏱️ Exact length, to the second</h3>
+      <h3>Exact length, to the second</h3>
       Ask for <code>60s</code> and you get 60 seconds. NarraReel stretches the pauses between sentences first,
       because that sounds natural, and changes speed only for what is left. If the gap is too big, it tells you
       exactly how many words to add or cut.
@@ -83,12 +117,12 @@ already wrote**. It does not generate your content for you.
   </tr>
   <tr>
     <td width="50%" valign="top">
-      <h3>💬 Captions that keep people watching</h3>
+      <h3>Captions that keep people watching</h3>
       Each word is highlighted at the moment it is spoken, using the voice engine's own word timings.
       10 presets, 19 bundled fonts, a live preview, and a transparent overlay export for your editor.
     </td>
     <td width="50%" valign="top">
-      <h3>🔓 Open and local</h3>
+      <h3>Open and local</h3>
       MIT code, models you can use commercially, fonts you are allowed to ship. Works fully offline after one model
       download. Nothing is uploaded, and there is no "Made with" stamp on your videos.
     </td>
@@ -97,7 +131,8 @@ already wrote**. It does not generate your content for you.
 
 ---
 
-## 🚀 Quick start
+<a id="quick-start"></a>
+## Quick start
 
 You need **Python 3.10+** and **[ffmpeg](https://ffmpeg.org/)** with libass.
 
@@ -115,7 +150,7 @@ Stuck at any step? [Open an issue](https://github.com/SanTiwari07/NarraReel/issu
 Unclear setup instructions count as bugs, and we fix them.
 
 <details>
-<summary><b>📦 Installing ffmpeg</b></summary>
+<summary><b>Installing ffmpeg</b></summary>
 
 | OS | Command |
 |---|---|
@@ -127,7 +162,7 @@ Unclear setup instructions count as bugs, and we fix them.
 </details>
 
 <details>
-<summary><b>🧩 Optional extras: offline voices, precise timing, voice cloning</b></summary>
+<summary><b>Optional extras: offline voices, precise timing, voice cloning</b></summary>
 
 | Extra | What it adds |
 |---|---|
@@ -138,7 +173,7 @@ Unclear setup instructions count as bugs, and we fix them.
 </details>
 
 <details>
-<summary><b>🐳 Docker</b></summary>
+<summary><b>Docker</b></summary>
 
 ```bash
 docker build -f docker/Dockerfile -t narrareel .
@@ -148,7 +183,7 @@ docker run -p 8765:8765 -v narrareel-data:/data narrareel     # open the link it
 </details>
 
 <details>
-<summary><b>🛠️ Building the web app from source</b></summary>
+<summary><b>Building the web app from source</b></summary>
 
 The repository ships the web app's source. To build it, run this once in `frontend/` (Node 22):
 
@@ -162,7 +197,7 @@ Released packages will include the built app already.
 
 ---
 
-## 🪄 Four steps from script to Reel
+## Four steps from script to Reel
 
 | | Step | What you do |
 |:-:|---|---|
@@ -175,7 +210,8 @@ Released packages will include the built app already.
 
 ---
 
-## 🎨 Caption styles
+<a id="caption-styles"></a>
+## Caption styles
 
 Ten presets designed for short video. Pick one with `--style <id>`, or list them with `narrareel styles`.
 
@@ -207,7 +243,8 @@ settings that work well for each one.
 
 ---
 
-## ⌨️ Command line
+<a id="command-line"></a>
+## Command line
 
 Everything the web app does, you can script too:
 
@@ -235,24 +272,25 @@ Every command has `--help`, and most take `--json` for automation.
 
 ---
 
-## 🧠 How it works
+<a id="how-it-works"></a>
+## How it works
 
 ```mermaid
 flowchart LR
-    A["📝 Script"] --> B["Analyse<br/>words, length, language"]
+    A["Script"] --> B["Analyse<br/>words, length, language"]
     B --> C["Speak sentence by sentence<br/>Edge · Kokoro · your voice"]
     C --> D["Fit to target length<br/>pauses first, then speed"]
     D --> E["Word timings<br/>native or Whisper-aligned"]
     E --> F["Styled ASS captions"]
     F --> G["ffmpeg + libass"]
-    G --> H["🎬 MP4 · WebM · ProRes<br/>+ MP3 · SRT · JSON"]
+    G --> H["MP4 · WebM · ProRes<br/>+ MP3 · SRT · JSON"]
 ```
 
 Speaking one sentence at a time lets NarraReel measure every gap it can stretch, which is how it lands on the exact
 second without making the voice sound sped up.
 
 <details>
-<summary><b>🧱 Tech stack</b></summary>
+<summary><b>Tech stack</b></summary>
 
 | Part | Built with |
 |---|---|
@@ -267,15 +305,15 @@ second without making the voice sound sped up.
 
 ---
 
-## ⚖️ How it compares
+## How it compares
 
 | | **NarraReel** | AI-video generators<br><sub>e.g. MoneyPrinterTurbo, ShortGPT</sub> | Voice studios<br><sub>e.g. VoiceStudio</sub> |
 |---|:-:|:-:|:-:|
-| You write the script | ✅ that's the point | ❌ written from a topic | n/a |
-| Exact duration targeting | ✅ | ❌ | ❌ |
-| Your cloned voice + energy control | ✅ | ⚠️ mostly stock voices | ✅ |
-| Word-synced animated captions | ✅ presets, fonts, preview | ⚠️ basic subtitles | ❌ |
-| Stock footage / B-roll | ⚠️ your own background only | ✅ | ❌ |
+| You write the script | Yes, that's the point | No, written from a topic | n/a |
+| Exact duration targeting | Yes | No | No |
+| Your cloned voice + energy control | Yes | Mostly stock voices | Yes |
+| Word-synced animated captions | Yes, presets, fonts, preview | Basic subtitles | No |
+| Stock footage / B-roll | Your own background only | Yes | No |
 | Licence | MIT | MIT | AGPL-3.0 |
 
 <sub>Based on each project's own description when we compared them (October 2026); corrections are welcome.
@@ -284,7 +322,7 @@ than we are.</sub>
 
 ---
 
-## 🛡️ Responsible use
+## Responsible use
 
 Clone only your own voice, or a voice you have explicit permission to use. NarraReel asks every time and records
 the confirmation, keeps the model's inaudible watermark on, and has no "clone from a link" feature. Read
@@ -293,7 +331,8 @@ the current rules of the platform you post on.
 
 ---
 
-## 🗺️ Roadmap
+<a id="roadmap"></a>
+## Roadmap
 
 **Working today**
 
@@ -316,22 +355,26 @@ The full plan and decisions live in [WHAT_TO_DO.md](WHAT_TO_DO.md).
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 Presets, fonts, formats and engines are plain files and small classes, so a new caption style can be **one JSON
 file**. See [CONTRIBUTING.md](CONTRIBUTING.md) to get started, then pick one of the
 [good first issues](https://github.com/SanTiwari07/NarraReel/labels/good%20first%20issue); each one lists the files
 to change and how to test it.
 
-If NarraReel saved you an afternoon of editing, a ⭐ helps other creators find it.
+<p align="center">
+  <b>If NarraReel saved you an afternoon of editing, <a href="https://github.com/SanTiwari07/NarraReel/stargazers">star the repo</a> so other creators can find it.</b>
+</p>
 
-<a href="https://star-history.com/#SanTiwari07/NarraReel&Date">
-  <img src="https://api.star-history.com/svg?repos=SanTiwari07/NarraReel&type=Date" alt="Star history chart" width="600">
-</a>
+<p align="center">
+  <a href="https://star-history.com/#SanTiwari07/NarraReel&Date">
+    <img src="https://api.star-history.com/svg?repos=SanTiwari07/NarraReel&type=Date" alt="Star history chart" width="600">
+  </a>
+</p>
 
 ---
 
-## 📜 Credits and licence
+## Credits and licence
 
 NarraReel is [MIT](LICENSE). It stands on [edge-tts](https://github.com/rany2/edge-tts),
 [Kokoro](https://github.com/hexgrad/kokoro) via [kokoro-onnx](https://github.com/thewh1teagle/kokoro-onnx),
